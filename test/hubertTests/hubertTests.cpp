@@ -18,8 +18,6 @@
 ///////////////////////////////////////////////////////////////////////////
 struct HubertTestSetup
 {
-    ~HubertTestSetup() { printf("Destructor\n"); }
-
     // Canonical list of "invalid" numbers used for testing of error conditions
 
     std::vector<float> invalidFloat{
@@ -117,6 +115,7 @@ struct HubertTestSetup
         -double(std::numeric_limits<double>::max()),
     };
 };
+static HubertTestSetup gSetup;
 
 
 
@@ -721,98 +720,198 @@ TEST_CASE("Subnormal  check on primitive types", "[validity]")
 // Point3 construction tests 
 ///////////////////////////////////////////////////////////////////////////
 
-TEST_CASE("Construct Point3<float> with default parameters", "[Point3]")
+TEST_CASE("Construct Point3 with default parameters", "[Point3]")
 {
-    hubert::Point3<float> p1;
+    SECTION("Float values")
+    {
+        hubert::Point3<float> p1;
 
-    CHECK(p1.x() == float(0.0));
-    CHECK(p1.y() == float(0.0));
-    CHECK(p1.z() == float(0.0));
+        CHECK(p1.x() == float(0.0));
+        CHECK(p1.y() == float(0.0));
+        CHECK(p1.z() == float(0.0));
+    }
+
+    SECTION("Double values")
+    {
+        hubert::Point3<double> p1;
+
+        CHECK(p1.x() == double(0.0));
+        CHECK(p1.y() == double(0.0));
+        CHECK(p1.z() == double(0.0));
+    }
 }
 
-TEST_CASE("Construct Point3<double> with default parameters", "[Point3]")
+TEST_CASE("Construct Point3 with constant parameters", "[Point3]")
 {
-    hubert::Point3<double> p1;
+    SECTION("Float values")
+    {
+        hubert::Point3<float> p1(float(1.1), float(2.1), float(3.1));
 
-    CHECK(p1.x() == double(0.0));
-    CHECK(p1.y() == double(0.0));
-    CHECK(p1.z() == double(0.0));
-}
+        CHECK(p1.x() == float(1.1));
+        CHECK(p1.y() == float(2.1));
+        CHECK(p1.z() == float(3.1));
+    }
+    SECTION("Double values")
+    {
+        hubert::Point3<double> p1(1.1, 2.1, 3.1);
 
-TEST_CASE("Construct Point3<float> with constant parameters", "[Point3]")
-{
-    hubert::Point3<float> p1(float(1.1), float(2.1), float(3.1));
-
-    CHECK(p1.x() == float(1.1));
-    CHECK(p1.y() == float(2.1));
-    CHECK(p1.z() == float(3.1));
-}
-
-
-TEST_CASE("Construct Point3<double> with constant parameters", "[Point3]")
-{
-    hubert::Point3<double> p1(1.1, 2.1, 3.1);
-
-    CHECK(p1.x() == double(1.1));
-    CHECK(p1.y() == double(2.1));
-    CHECK(p1.z() == double(3.1));
+        CHECK(p1.x() == double(1.1));
+        CHECK(p1.y() == double(2.1));
+        CHECK(p1.z() == double(3.1));
+    }
 }
 
 
 TEST_CASE("Construct Point3<float> with copy  constructor", "[Point3]")
 {
-    hubert::Point3<float> p1(float(1.1), float(2.1), float(3.1));
-    hubert::Point3<float> p2(p1);
+    SECTION("Float values")
+    {
+        hubert::Point3<float> p1(float(1.1), float(2.1), float(3.1));
+        hubert::Point3<float> p2(p1);
 
-    CHECK(p2.x() == float(1.1));
-    CHECK(p2.y() == float(2.1));
-    CHECK(p2.z() == float(3.1));
+        CHECK(p2.x() == float(1.1));
+        CHECK(p2.y() == float(2.1));
+        CHECK(p2.z() == float(3.1));
+    }
+
+    SECTION("Double values")
+    {
+        hubert::Point3<double> p1(1.1, 2.1, 3.1);
+        hubert::Point3<double> p2(p1);
+
+        CHECK(p2.x() == double(1.1));
+        CHECK(p2.y() == double(2.1));
+        CHECK(p2.z() == double(3.1));
+    }
 }
 
-TEST_CASE("Construct Point3<double> with copy  constructor", "[Point3]")
+TEST_CASE("Construct Point3 with assignment", "[Point3]")
 {
-    hubert::Point3<double> p1(1.1, 2.1, 3.1);
-    hubert::Point3<double> p2(p1);
+    SECTION("Float values")
+    {
+        hubert::Point3<float> p1(float(1.1), float(2.1), float(3.1));
+        hubert::Point3<float> p2 = p1;
 
-    CHECK(p2.x() == double(1.1));
-    CHECK(p2.y() == double(2.1));
-    CHECK(p2.z() == double(3.1));
+        CHECK(p2.x() == float(1.1));
+        CHECK(p2.y() == float(2.1));
+        CHECK(p2.z() == float(3.1));
+    }
+
+    SECTION("Double values")
+    {
+        hubert::Point3<double> p1(1.1, 2.1, 3.1);
+        hubert::Point3<double> p2 = p1;
+
+        CHECK(p2.x() == double(1.1));
+        CHECK(p2.y() == double(2.1));
+        CHECK(p2.z() == double(3.1));
+    }
 }
 
-TEST_CASE("Construct Point3<float> with assignment", "[Point3]")
+TEST_CASE("Construct Point3 with initializer", "[Point3]")
 {
-    hubert::Point3<float> p1(float(1.1), float(2.1), float(3.1));
-    hubert::Point3<float> p2 = p1;
+    SECTION("Float values")
+    {
+        hubert::Point3<float> p2{ float(1.1), float(2.1), float(3.1) };
 
-    CHECK(p2.x() == float(1.1));
-    CHECK(p2.y() == float(2.1));
-    CHECK(p2.z() == float(3.1));
+        CHECK(p2.x() == float(1.1));
+        CHECK(p2.y() == float(2.1));
+        CHECK(p2.z() == float(3.1));
+    }
+
+    SECTION("Double values")
+    {
+        hubert::Point3<double> p2{ 1.1, 2.1, 3.1 };
+
+        CHECK(p2.x() == double(1.1));
+        CHECK(p2.y() == double(2.1));
+        CHECK(p2.z() == double(3.1));
+    }
 }
 
-TEST_CASE("Construct Point3<double> with assignment", "[Point3]")
+///////////////////////////////////////////////////////////////////////////
+// Point3 validity 
+///////////////////////////////////////////////////////////////////////////
+
+TEST_CASE("Check validity routines", "[Point3]")
 {
-    hubert::Point3<double> p1(1.1, 2.1, 3.1);
-    hubert::Point3<double> p2 = p1;
+    SECTION("Valid Float")
+    {
+        for (auto x : gSetup.validFloat)
+        {
+            for (auto y : gSetup.validFloat)
+            {
+                for (auto z : gSetup.validFloat)
+                {
+                    hubert::Point3<float> p1{ x, y, z };
 
-    CHECK(p2.x() == double(1.1));
-    CHECK(p2.y() == double(2.1));
-    CHECK(p2.z() == double(3.1));
-}
+                    CHECK(p1.amValid() == true);
+                    CHECK(p1.amDegenerate() == false);
 
-TEST_CASE("Construct Point3<float> with initializer", "[Point3]")
-{
-    hubert::Point3<float> p2{ float(1.1), float(2.1), float(3.1) };
+                    // we have already run the isValid test - so assuming it works, 
+                    // this does too
+                    bool tv = hubert::isSubnormal(x) || hubert::isSubnormal(y) || hubert::isSubnormal(z);
+                    CHECK(p1.amSubnormal() == tv);
+                }
+            }
+        }
+    }
 
-    CHECK(p2.x() == float(1.1));
-    CHECK(p2.y() == float(2.1));
-    CHECK(p2.z() == float(3.1));
-}
+    SECTION("Valid Double")
+    {
+        for (auto x : gSetup.validDouble)
+        {
+            for (auto y : gSetup.validDouble)
+            {
+                for (auto z : gSetup.validDouble)
+                {
+                    hubert::Point3<double> p1{ x, y, z };
 
-TEST_CASE("Construct Point3<double> with initializer", "[Point3]")
-{
-    hubert::Point3<double> p2{ 1.1, 2.1, 3.1 };
+                    CHECK(p1.amValid() == true);
+                    CHECK(p1.amDegenerate() == false);
 
-    CHECK(p2.x() == double(1.1));
-    CHECK(p2.y() == double(2.1));
-    CHECK(p2.z() == double(3.1));
+                    // we have already run the isValid test - so assuming it works, 
+                    // this does too
+                    bool tv = hubert::isSubnormal(x) || hubert::isSubnormal(y) || hubert::isSubnormal(z);
+                    CHECK(p1.amSubnormal() == tv);
+                }
+            }
+        }
+    }
+
+    SECTION("Invalid Float")
+    {
+        for (auto x : gSetup.invalidFloat)
+        {
+            for (auto y : gSetup.invalidFloat)
+            {
+                for (auto z : gSetup.invalidFloat)
+                {
+                    hubert::Point3<float> p1{ x, y, z };
+
+                    CHECK(p1.amValid() == false);
+                    CHECK(p1.amDegenerate() == true);
+                    CHECK(p1.amSubnormal() == false);
+                }
+            }
+        }
+    }
+
+    SECTION("Invalid Double")
+    {
+        for (auto x : gSetup.invalidDouble)
+        {
+            for (auto y : gSetup.invalidDouble)
+            {
+                for (auto z : gSetup.invalidDouble)
+                {
+                    hubert::Point3<double> p1{ x, y, z };
+
+                    CHECK(p1.amValid() == false);
+                    CHECK(p1.amDegenerate() == true);
+                    CHECK(p1.amSubnormal() == false);
+                }
+            }
+        }
+    }
 }
