@@ -1,0 +1,6 @@
+.vs
+*.user
+*.suo
+
+/test/hubertTests/out/**
+/build/**
