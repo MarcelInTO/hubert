@@ -11,7 +11,11 @@
 #include "hubert.hpp"
 
 
-
+///////////////////////////////////////////////////////////////////////////
+//
+// README - NOTES
+//
+///////////////////////////////////////////////////////////////////////////
 struct HubertTestSetup
 {
     ~HubertTestSetup() { printf("Destructor\n"); }
@@ -159,6 +163,7 @@ TEST_CASE("Epsilon equals float", "[epsilon]")
 {
     float shrinkFactor = .75;
 
+    SECTION("Values are positive")
     {
         float f1 = float(10.1);
         CHECK(hubert::isEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
@@ -167,6 +172,7 @@ TEST_CASE("Epsilon equals float", "[epsilon]")
         CHECK(hubert::isEqual(f1, f1 - std::numeric_limits<float>::epsilon() * (f1 * float(2.0))) == false);
     }
 
+    SECTION("Values are negative")
     {
         float f1 = float(-10.1);
         CHECK(hubert::isEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
@@ -175,6 +181,7 @@ TEST_CASE("Epsilon equals float", "[epsilon]")
         CHECK(hubert::isEqual(f1, f1 - std::numeric_limits<float>::epsilon() * (f1 * float(2.0))) == false);
     }
 
+    SECTION("Values are positive and huge")
     {
         float f1 = float(10.1e17);
         CHECK(hubert::isEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
@@ -183,8 +190,27 @@ TEST_CASE("Epsilon equals float", "[epsilon]")
         CHECK(hubert::isEqual(f1, f1 - std::numeric_limits<float>::epsilon() * (f1 * float(2.0))) == false);
     }
 
+    SECTION("Values are negative and huge")
     {
         float f1 = float(-10.1e17);
+        CHECK(hubert::isEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isEqual(f1, f1 - std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isEqual(f1, f1 + std::numeric_limits<float>::epsilon() * (f1 * float(2.0))) == false);
+        CHECK(hubert::isEqual(f1, f1 - std::numeric_limits<float>::epsilon() * (f1 * float(2.0))) == false);
+    }
+
+    SECTION("Values are positive and tiny")
+    {
+        float f1 = float(10.1e-17);
+        CHECK(hubert::isEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isEqual(f1, f1 - std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isEqual(f1, f1 + std::numeric_limits<float>::epsilon() * (f1 * float(2.0))) == false);
+        CHECK(hubert::isEqual(f1, f1 - std::numeric_limits<float>::epsilon() * (f1 * float(2.0))) == false);
+    }
+
+    SECTION("Values are negative and tiny")
+    {
+        float f1 = float(-10.1e-17);
         CHECK(hubert::isEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
         CHECK(hubert::isEqual(f1, f1 - std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
         CHECK(hubert::isEqual(f1, f1 + std::numeric_limits<float>::epsilon() * (f1 * float(2.0))) == false);
@@ -196,6 +222,7 @@ TEST_CASE("Epsilon equals double", "[epsilon]")
 {
     double shrinkFactor = .75;
 
+    SECTION("Values are positive")
     {
         double f1 = double(10.1);
         CHECK(hubert::isEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
@@ -204,6 +231,7 @@ TEST_CASE("Epsilon equals double", "[epsilon]")
         CHECK(hubert::isEqual(f1, f1 - std::numeric_limits<double>::epsilon() * (f1 * double(2.0))) == false);
     }
 
+    SECTION("Values are negative")
     {
         double f1 = double(-10.1);
         CHECK(hubert::isEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
@@ -212,6 +240,7 @@ TEST_CASE("Epsilon equals double", "[epsilon]")
         CHECK(hubert::isEqual(f1, f1 - std::numeric_limits<double>::epsilon() * (f1 * double(2.0))) == false);
     }
 
+    SECTION("Values are positive and huge")
     {
         double f1 = double(10.1e17);
         CHECK(hubert::isEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
@@ -220,8 +249,27 @@ TEST_CASE("Epsilon equals double", "[epsilon]")
         CHECK(hubert::isEqual(f1, f1 - std::numeric_limits<double>::epsilon() * (f1 * double(2.0))) == false);
     }
 
+    SECTION("Values are negative and huge")
     {
         double f1 = double(-10.1e17);
+        CHECK(hubert::isEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isEqual(f1, f1 - std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isEqual(f1, f1 + std::numeric_limits<double>::epsilon() * (f1 * double(2.0))) == false);
+        CHECK(hubert::isEqual(f1, f1 - std::numeric_limits<double>::epsilon() * (f1 * double(2.0))) == false);
+    }
+
+    SECTION("Values are positive and tiny")
+    {
+        double f1 = double(10.1e-17);
+        CHECK(hubert::isEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isEqual(f1, f1 - std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isEqual(f1, f1 + std::numeric_limits<double>::epsilon() * (f1 * double(2.0))) == false);
+        CHECK(hubert::isEqual(f1, f1 - std::numeric_limits<double>::epsilon() * (f1 * double(2.0))) == false);
+    }
+
+    SECTION("Values are negative and tiny")
+    {
+        double f1 = double(-10.1e-17);
         CHECK(hubert::isEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
         CHECK(hubert::isEqual(f1, f1 - std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
         CHECK(hubert::isEqual(f1, f1 + std::numeric_limits<double>::epsilon() * (f1 * double(2.0))) == false);
@@ -231,18 +279,441 @@ TEST_CASE("Epsilon equals double", "[epsilon]")
 
 TEST_CASE("Epsilon greater or equal float", "[epsilon]")
 {
+    float shrinkFactor = .75;
+
+    SECTION ("Values are positive and equal or close to equal")
     {
         float f1 = float(10.1);
         CHECK(hubert::isGreaterOrEqual(f1, f1) == true);
-        CHECK(hubert::isGreaterOrEqual(f1, f1 * float(2.0)) == false);
-        CHECK(hubert::isGreaterOrEqual(f1 * float(2.0), f1) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 - std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
     }
 
+    SECTION("Values are negative and equal or close to equal")
     {
         float f1 = float(-10.1);
         CHECK(hubert::isGreaterOrEqual(f1, f1) == true);
-        CHECK(hubert::isGreaterOrEqual(f1, f1 * float(2.0)) == true);
-        CHECK(hubert::isGreaterOrEqual(f1 * float(2.0), f1) == false);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 - std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    SECTION("Values are huge positive and equal or close to equal")
+    {
+        float f1 = float(10.1e17);
+        CHECK(hubert::isGreaterOrEqual(f1, f1) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 - std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    SECTION("Values are huge negative and equal or close to equal")
+    {
+        float f1 = float(-10.1e17);
+        CHECK(hubert::isGreaterOrEqual(f1, f1) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 - std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    SECTION("Values are tiny positive and equal or close to equal")
+    {
+        float f1 = float(10.1e-17);
+        CHECK(hubert::isGreaterOrEqual(f1, f1) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 - std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    SECTION("Values are tiny negative and equal or close to equal")
+    {
+        float f1 = float(-10.1e-17);
+        CHECK(hubert::isGreaterOrEqual(f1, f1) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 - std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    float growFactor = 2.0;
+
+    SECTION("Values are positive and greater")
+    {
+        float f1 = float(10.1);
+        CHECK(hubert::isGreaterOrEqual(f1 + std::numeric_limits<float>::epsilon() * f1 * growFactor, f1) == true);
+    }
+
+    SECTION("Values are negative and greater")
+    {
+        float f1 = float(-10.1);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * growFactor) == true);
+    }
+
+    SECTION("Values are huge positive and greater")
+    {
+        float f1 = float(10.1e17);
+        CHECK(hubert::isGreaterOrEqual(f1 + std::numeric_limits<float>::epsilon() * f1 * growFactor, f1) == true);
+    }
+
+    SECTION("Values are huge negative and greater")
+    {
+        float f1 = float(-10.1e-17);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * growFactor) == true);
+    }
+
+    SECTION("Values are tiny positive and greater")
+    {
+        float f1 = float(10.1e-17);
+        CHECK(hubert::isGreaterOrEqual(f1 + std::numeric_limits<float>::epsilon() * f1 * growFactor, f1) == true);
+    }
+
+    SECTION("Values are tiny negative and greater")
+    {
+        float f1 = float(-10.1e-17);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * growFactor) == true);
+    }
+}
+
+
+TEST_CASE("Epsilon greater or equal double", "[epsilon]")
+{
+    double shrinkFactor = .75;
+
+    SECTION("Values are positive and equal or close to equal")
+    {
+        double f1 = double(10.1);
+        CHECK(hubert::isGreaterOrEqual(f1, f1) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 - std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    SECTION("Values are negative and equal or close to equal")
+    {
+        double f1 = double(-10.1);
+        CHECK(hubert::isGreaterOrEqual(f1, f1) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 - std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    SECTION("Values are huge positive and equal or close to equal")
+    {
+        double f1 = double(10.1e17);
+        CHECK(hubert::isGreaterOrEqual(f1, f1) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 - std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    SECTION("Values are huge negative and equal or close to equal")
+    {
+        double f1 = double(-10.1e17);
+        CHECK(hubert::isGreaterOrEqual(f1, f1) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 - std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    SECTION("Values are tiny positive and equal or close to equal")
+    {
+        double f1 = double(10.1e-17);
+        CHECK(hubert::isGreaterOrEqual(f1, f1) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 - std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    SECTION("Values are tiny negative and equal or close to equal")
+    {
+        double f1 = double(-10.1e-17);
+        CHECK(hubert::isGreaterOrEqual(f1, f1) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 - std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    double growFactor = 2.0;
+
+    SECTION("Values are positive and greater")
+    {
+        double f1 = double(10.1);
+        CHECK(hubert::isGreaterOrEqual(f1 + std::numeric_limits<double>::epsilon() * f1 * growFactor, f1) == true);
+    }
+
+    SECTION("Values are negative and greater")
+    {
+        double f1 = double(-10.1);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * growFactor) == true);
+    }
+
+    SECTION("Values are huge positive and greater")
+    {
+        double f1 = double(10.1e17);
+        CHECK(hubert::isGreaterOrEqual(f1 + std::numeric_limits<double>::epsilon() * f1 * growFactor, f1) == true);
+    }
+
+    SECTION("Values are huge negative and greater")
+    {
+        double f1 = double(-10.1e-17);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * growFactor) == true);
+    }
+
+    SECTION("Values are tiny positive and greater")
+    {
+        double f1 = double(10.1e-17);
+        CHECK(hubert::isGreaterOrEqual(f1 + std::numeric_limits<double>::epsilon() * f1 * growFactor, f1) == true);
+    }
+
+    SECTION("Values are tiny negative and greater")
+    {
+        double f1 = double(-10.1e-17);
+        CHECK(hubert::isGreaterOrEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * growFactor) == true);
+    }
+}
+
+
+TEST_CASE("Epsilon less or equal float", "[epsilon]")
+{
+    float shrinkFactor = .75;
+
+    SECTION("Values are positive and equal or close to equal")
+    {
+        float f1 = float(10.1);
+        CHECK(hubert::isLessOrEqual(f1, f1) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 - std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    SECTION("Values are negative and equal or close to equal")
+    {
+        float f1 = float(-10.1);
+        CHECK(hubert::isLessOrEqual(f1, f1) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 - std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    SECTION("Values are huge positive and equal or close to equal")
+    {
+        float f1 = float(10.1e17);
+        CHECK(hubert::isLessOrEqual(f1, f1) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 - std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    SECTION("Values are huge negative and equal or close to equal")
+    {
+        float f1 = float(-10.1e17);
+        CHECK(hubert::isLessOrEqual(f1, f1) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 - std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    SECTION("Values are tiny positive and equal or close to equal")
+    {
+        float f1 = float(10.1e-17);
+        CHECK(hubert::isLessOrEqual(f1, f1) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 - std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    SECTION("Values are tiny negative and equal or close to equal")
+    {
+        float f1 = float(-10.1e-17);
+        CHECK(hubert::isLessOrEqual(f1, f1) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 - std::numeric_limits<float>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    float growFactor = 2.0;
+
+    SECTION("Values are positive and less")
+    {
+        float f1 = float(10.1);
+        CHECK(hubert::isLessOrEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * growFactor) == true);
+    }
+
+    SECTION("Values are negative and less")
+    {
+        float f1 = float(-10.1);
+        CHECK(hubert::isLessOrEqual(f1 + std::numeric_limits<float>::epsilon() * f1 * growFactor, f1) == true);
+    }
+
+    SECTION("Values are huge positive and less")
+    {
+        float f1 = float(10.1e17);
+        CHECK(hubert::isLessOrEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * growFactor) == true);
+    }
+
+    SECTION("Values are huge negative and less")
+    {
+        float f1 = float(-10.1e-17);
+        CHECK(hubert::isLessOrEqual( f1 + std::numeric_limits<float>::epsilon() * f1 * growFactor, f1) == true);
+    }
+
+    SECTION("Values are tiny positive and less")
+    {
+        float f1 = float(10.1e-17);
+        CHECK(hubert::isLessOrEqual(f1, f1 + std::numeric_limits<float>::epsilon() * f1 * growFactor) == true);
+    }
+
+    SECTION("Values are tiny negative and less")
+    {
+        float f1 = float(-10.1e-17);
+        CHECK(hubert::isLessOrEqual(f1 + std::numeric_limits<float>::epsilon() * f1 * growFactor, f1) == true);
+    }
+}
+
+TEST_CASE("Epsilon less or equal double", "[epsilon]")
+{
+    double shrinkFactor = .75;
+
+    SECTION("Values are positive and equal or close to equal")
+    {
+        double f1 = double(10.1);
+        CHECK(hubert::isLessOrEqual(f1, f1) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 - std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    SECTION("Values are negative and equal or close to equal")
+    {
+        double f1 = double(-10.1);
+        CHECK(hubert::isLessOrEqual(f1, f1) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 - std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    SECTION("Values are huge positive and equal or close to equal")
+    {
+        double f1 = double(10.1e17);
+        CHECK(hubert::isLessOrEqual(f1, f1) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 - std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    SECTION("Values are huge negative and equal or close to equal")
+    {
+        double f1 = double(-10.1e17);
+        CHECK(hubert::isLessOrEqual(f1, f1) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 - std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    SECTION("Values are tiny positive and equal or close to equal")
+    {
+        double f1 = double(10.1e-17);
+        CHECK(hubert::isLessOrEqual(f1, f1) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 - std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    SECTION("Values are tiny negative and equal or close to equal")
+    {
+        double f1 = double(-10.1e-17);
+        CHECK(hubert::isLessOrEqual(f1, f1) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+        CHECK(hubert::isLessOrEqual(f1, f1 - std::numeric_limits<double>::epsilon() * f1 * shrinkFactor) == true);
+    }
+
+    double growFactor = 2.0;
+
+    SECTION("Values are positive and less")
+    {
+        double f1 = double(10.1);
+        CHECK(hubert::isLessOrEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * growFactor) == true);
+    }
+
+    SECTION("Values are negative and less")
+    {
+        double f1 = double(-10.1);
+        CHECK(hubert::isLessOrEqual(f1 + std::numeric_limits<double>::epsilon() * f1 * growFactor, f1) == true);
+    }
+
+    SECTION("Values are huge positive and less")
+    {
+        double f1 = double(10.1e17);
+        CHECK(hubert::isLessOrEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * growFactor) == true);
+    }
+
+    SECTION("Values are huge negative and less")
+    {
+        double f1 = double(-10.1e-17);
+        CHECK(hubert::isLessOrEqual(f1 + std::numeric_limits<double>::epsilon() * f1 * growFactor, f1) == true);
+    }
+
+    SECTION("Values are tiny positive and less")
+    {
+        double f1 = double(10.1e-17);
+        CHECK(hubert::isLessOrEqual(f1, f1 + std::numeric_limits<double>::epsilon() * f1 * growFactor) == true);
+    }
+
+    SECTION("Values are tiny negative and less")
+    {
+        double f1 = double(-10.1e-17);
+        CHECK(hubert::isLessOrEqual(f1 + std::numeric_limits<double>::epsilon() * f1 * growFactor, f1) == true);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////
+// Validation checks on primitive types 
+///////////////////////////////////////////////////////////////////////////
+
+TEST_CASE("Invalidity check on primitive types", "[validity]")
+{
+    SECTION("Values are float and results should be true")
+    {
+        CHECK(hubert::isValid(float(1.2)) == true);
+        CHECK(hubert::isValid(float(0.0)) == true);
+        CHECK(hubert::isValid(float(-0.0)) == true);
+        CHECK(hubert::isValid(std::numeric_limits<float>::min() / float(2.0)) == true);
+    }
+
+    SECTION("Values are float and results should be false")
+    {
+        CHECK(hubert::isValid(std::numeric_limits<float>::infinity()) == false);
+        CHECK(hubert::isValid(-std::numeric_limits<float>::infinity()) == false);
+        CHECK(hubert::isValid(std::numeric_limits<float>::quiet_NaN()) == false);
+        CHECK(hubert::isValid(-std::numeric_limits<float>::quiet_NaN()) == false);
+    }
+
+    SECTION("Values are double and results should be true")
+    {
+        CHECK(hubert::isValid(double(1.2)) == true);
+        CHECK(hubert::isValid(double(0.0)) == true);
+        CHECK(hubert::isValid(double(-0.0)) == true);
+        CHECK(hubert::isValid(std::numeric_limits<double>::min() / double(2.0)) == true);
+    }
+
+    SECTION("Values are double and results should be false")
+    {
+        CHECK(hubert::isValid(std::numeric_limits<double>::infinity()) == false);
+        CHECK(hubert::isValid(-std::numeric_limits<double>::infinity()) == false);
+        CHECK(hubert::isValid(std::numeric_limits<double>::quiet_NaN()) == false);
+        CHECK(hubert::isValid(-std::numeric_limits<double>::quiet_NaN()) == false);
+    }
+}
+
+TEST_CASE("Subnormal  check on primitive types", "[validity]")
+{
+    SECTION("Values are float and results should be true")
+    {
+        CHECK(hubert::isSubnormal(std::numeric_limits<float>::min() / float(2.0)) == true);
+    }
+
+    SECTION("Values are float and results should be false")
+    {
+        CHECK(hubert::isSubnormal(float(1.2)) == false);
+        CHECK(hubert::isSubnormal(float(0.0)) == false);
+        CHECK(hubert::isSubnormal(float(-0.0)) == false);
+        CHECK(hubert::isSubnormal(std::numeric_limits<float>::infinity()) == false);
+        CHECK(hubert::isSubnormal(-std::numeric_limits<float>::infinity()) == false);
+        CHECK(hubert::isSubnormal(std::numeric_limits<float>::quiet_NaN()) == false);
+        CHECK(hubert::isSubnormal(-std::numeric_limits<float>::quiet_NaN()) == false);
+    }
+
+    SECTION("Values are double and results should be true")
+    {
+        CHECK(hubert::isSubnormal(std::numeric_limits<double>::min() / double(2.0)) == true);
+    }
+
+    SECTION("Values are double and results should be false")
+    {
+        CHECK(hubert::isSubnormal(double(1.2)) == false);
+        CHECK(hubert::isSubnormal(double(0.0)) == false);
+        CHECK(hubert::isSubnormal(double(-0.0)) == false);
+        CHECK(hubert::isSubnormal(std::numeric_limits<double>::infinity()) == false);
+        CHECK(hubert::isSubnormal(-std::numeric_limits<double>::infinity()) == false);
+        CHECK(hubert::isSubnormal(std::numeric_limits<double>::quiet_NaN()) == false);
+        CHECK(hubert::isSubnormal(-std::numeric_limits<double>::quiet_NaN()) == false);
     }
 }
 
