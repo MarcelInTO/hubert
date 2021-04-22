@@ -3,4 +3,8 @@
 *.suo
 
 /test/hubertTests/out/**
+/test/hubertTests/CMakeFiles/**
+/test/hubertTests/cmake_install.cmake
+/test/hubertTests/CMakeCache.txt
+/test/hubertTests/Makefile
 /build/**

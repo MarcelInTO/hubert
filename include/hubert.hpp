@@ -80,12 +80,12 @@ inline bool isEqual(T v1, T v2)
 
     if (v1 != 0.0 && v2 != 0.0)
     {
-        return abs(v1 - v2) / abs(v1) <= eps &&  abs(v1 - v2) / abs(v2) <= eps;
+         return std::abs(v1 - v2) / std::abs(v1) <= eps &&  std::abs(v1 - v2) / std::abs(v2) <= eps;
     }
     else
     {
-        return abs(v1 - v2) <= eps;
-    }
+        return std::abs(v1 - v2) <= eps;
+   }
 }
 
 template <typename T>
@@ -1449,7 +1449,7 @@ inline ResultCode intersect(const Plane<T>& thePlane, const Triangle3<T>& theTri
 */
 
 /*
-Copyright 2020 Tomas Akenine-Möller
+Copyright 2020 Tomas Akenine-Mï¿½ller
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -1595,9 +1595,9 @@ inline ResultCode coplanar_tri_tri(T N[3], T V0[3], T V1[3], T V2[3],
     short i0, i1;
     /* first project onto an axis-aligned plane, that maximizes the area */
     /* of the triangles, compute indices: i0,i1. */
-    A[0] = abs(N[0]);
-    A[1] = abs(N[1]);
-    A[2] = abs(N[2]);
+    A[0] = std::abs(N[0]);
+    A[1] = std::abs(N[1]);
+    A[2] = std::abs(N[2]);
     if (A[0] > A[1])
     {
         if (A[0] > A[2])
@@ -1729,10 +1729,10 @@ inline ResultCode intersect(const Triangle3<T>& tri1, const Triangle3<T>& tri2)
     CROSS(D, N1, N2);
 
     /* compute and index to the largest component of D */
-    max = abs(D[0]);
+    max = std::abs(D[0]);
     index = 0;
-    bb = abs(D[1]);
-    cc = abs(D[2]);
+    bb = std::abs(D[1]);
+    cc = std::abs(D[2]);
     if (bb > max) max = bb, index = 1;
     if (cc > max) max = cc, index = 2;
 
