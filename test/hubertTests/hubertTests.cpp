@@ -35,21 +35,15 @@ struct HubertTestSetup
     template<typename T>
     const std::vector<T>& getInvalid()
     {
-        return std::vector<T>();
+        if (sizeof(T) == sizeof(double))
+        {
+            return (std::vector<T> &) invalidDouble;
+        }
+        else
+        {
+            return (std::vector<T> &) invalidFloat;
+        }
     }
-
-    template<>
-    const std::vector<float>& getInvalid()
-    {
-        return invalidFloat;
-    }
-
-    template<>
-    const std::vector<double>& getInvalid()
-    {
-        return invalidDouble;
-    }
-
 
     // a list of various categories of valid (both normal and subnormal) numbers.
 
@@ -79,22 +73,18 @@ struct HubertTestSetup
         -double(std::numeric_limits<double>::max()),            // biggest negative
     };
 
-    template<typename T>
+    template<typename T, typename dummy = void>
     const std::vector<T> & getValid() 
     { 
-        return std::vector<T>(); 
-    }
-
-    template<>
-    const std::vector<float>& getValid()
-    {
-        return validFloat;
-    }
-
-    template<>
-    const std::vector<double>& getValid()
-    {
-        return validDouble;
+        if (sizeof(T) == sizeof(double))
+        {
+            return (std::vector<T> &)validDouble;
+        }
+        else
+        {
+            return (std::vector<T> &)validFloat;
+        }
+        
     }
 
     // a list of normal (not sub-normal, and not zero) numbers.
@@ -197,15 +187,15 @@ TEST_CASE("Illustrate float constants", "[intro]") {
 
 TEMPLATE_TEST_CASE("Epsilon equals", "[epsilon]", float, double)
 {
-    TestType  shrinkFactor = .75;
+    TestType  shrinkFactor = TestType(.75);
 
     SECTION("Values are positive")
     {
         TestType  f1 = TestType (10.1);
         CHECK(hubert::isEqual(f1, f1 + std::numeric_limits<TestType >::epsilon() * f1 * shrinkFactor) == true);
         CHECK(hubert::isEqual(f1, f1 - std::numeric_limits<TestType >::epsilon() * f1 * shrinkFactor) == true);
-        CHECK(hubert::isEqual(f1, f1 + std::numeric_limits<TestType >::epsilon() * (f1 * TestType (2.0))) == false);
-        CHECK(hubert::isEqual(f1, f1 - std::numeric_limits<TestType >::epsilon() * (f1 * TestType (2.0))) == false);
+        CHECK_FALSE(hubert::isEqual(f1, f1 + std::numeric_limits<TestType >::epsilon() * (f1 * TestType (2.0))));
+        CHECK_FALSE(hubert::isEqual(f1, f1 - std::numeric_limits<TestType >::epsilon() * (f1 * TestType (2.0))));
     }
 
     SECTION("Values are negative")
