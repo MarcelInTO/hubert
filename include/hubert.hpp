@@ -411,7 +411,7 @@ class Plane : public HubertBase
 {
     public:
         // constructors
-        Plane() : Point3<T>(T(0.0), T(0.0), T(0.0)), UnitVector3<T>(T(0.0), T(0.0), T(1.0)) {}
+        Plane() : Plane(Point3<T>(T(0.0), T(0.0), T(0.0)), UnitVector3<T>(T(0.0), T(0.0), T(1.0))) {}
         Plane(const Point3<T> & p, const UnitVector3<T> & v) : _base(p), _up(v) {}
         Plane(const Plane &) = default;
         ~Plane() = default;
@@ -434,7 +434,7 @@ class Ray3 : public HubertBase
 {
     public:
         // constructors
-        Ray3() : Point3<T>(T(0.0), T(0.0), T(0.0)), UnitVector3<T>(T(0.0), T(0.0), T(1.0)) {}
+        Ray3() : Ray3(Point3<T>(T(0.0), T(0.0), T(0.0)), UnitVector3<T>(T(0.0), T(0.0), T(1.0))) {}
         Ray3(const Point3<T> & p, const UnitVector3<T> & v) : _base(p), _direction(v) {}
         Ray3(const Ray3 &) = default;
         ~Ray3() = default;
@@ -456,7 +456,7 @@ class Segment3 : public HubertBase
 {
     public:
         // constructors
-        Segment3() : Point3<T>(T(0.0), T(0.0), T(0.0)), Point3<T>(T(1.0), T(1.0), T(1.0)) {}
+        Segment3() : Segment3(Point3<T>(T(0.0), T(0.0), T(0.0)), Point3<T>(T(1.0), T(1.0), T(1.0))) {}
         Segment3(const Point3<T> & inP1, const Point3<T> & inP2) : _p1(inP1), _p2(inP2) {}
         Segment3(const Segment3 &) = default;
         ~Segment3() = default;
