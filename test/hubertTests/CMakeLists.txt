@@ -15,10 +15,10 @@ add_executable (hubertTests
 	)
 
 
-if ("{CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # These are necessary to compile hubert
     target_compile_options(hubertTests PRIVATE "/Zc:__cplusplus")
-    target_compile_options(hubertTests PRIVATE "/std:c++latest")
+    target_compile_options(hubertTests PRIVATE "/std:c++17")
 
     #This is necessary to compile the amalgamated catch2 files
     target_compile_options(hubertTests PRIVATE "/permissive")
