@@ -6,5 +6,6 @@
 /test/hubertTests/CMakeFiles/**
 /test/hubertTests/cmake_install.cmake
 /test/hubertTests/CMakeCache.txt
+/test/hubertTests/CmakeSettings.json
 /test/hubertTests/Makefile
 /build/**
