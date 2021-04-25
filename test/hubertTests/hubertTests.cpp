@@ -526,7 +526,7 @@ TEMPLATE_TEST_CASE("Construct Point3 with initializer", "[Point3]", float, doubl
 // Point3 validity 
 ///////////////////////////////////////////////////////////////////////////
 
-TEMPLATE_TEST_CASE("Check validity routines", "[Point3]", float, double)
+TEMPLATE_TEST_CASE("Check Point3 validity routines", "[Point3]", float, double)
 {
     SECTION("Valid")
     {
@@ -568,3 +568,103 @@ TEMPLATE_TEST_CASE("Check validity routines", "[Point3]", float, double)
         }
     }
 } 
+
+
+///////////////////////////////////////////////////////////////////////////
+// Vector3 construction tests 
+///////////////////////////////////////////////////////////////////////////
+
+TEMPLATE_TEST_CASE("Construct Vector3 with default parameters", "[Vector3]", float, double)
+{
+    hubert::Vector3<TestType> p1;
+
+    CHECK(p1.x() == TestType(0.0));
+    CHECK(p1.y() == TestType(0.0));
+    CHECK(p1.z() == TestType(0.0));
+}
+
+TEMPLATE_TEST_CASE("Construct Vector3 with constant parameters", "[Vector3]", float, double)
+{
+    hubert::Vector3<TestType> p1(TestType(1.1), TestType(2.1), TestType(3.1));
+
+    CHECK(p1.x() == TestType(1.1));
+    CHECK(p1.y() == TestType(2.1));
+    CHECK(p1.z() == TestType(3.1));
+}
+
+
+TEMPLATE_TEST_CASE("Construct Vector3 with copy  constructor", "[Vector3]", float, double)
+{
+    hubert::Vector3<TestType> p1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::Vector3<TestType> p2(p1);
+
+    CHECK(p2.x() == TestType(1.1));
+    CHECK(p2.y() == TestType(2.1));
+    CHECK(p2.z() == TestType(3.1));
+}
+
+TEMPLATE_TEST_CASE("Construct Vector3 with assignment", "[Vector3]", float, double)
+{
+    hubert::Vector3<TestType> p1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::Vector3<TestType> p2 = p1;
+
+    CHECK(p2.x() == TestType(1.1));
+    CHECK(p2.y() == TestType(2.1));
+    CHECK(p2.z() == TestType(3.1));
+}
+
+TEMPLATE_TEST_CASE("Construct Vector3 with initializer", "[Vector3]", float, double)
+{
+    hubert::Vector3<TestType> p2{ TestType(1.1), TestType(2.1), TestType(3.1) };
+
+    CHECK(p2.x() == TestType(1.1));
+    CHECK(p2.y() == TestType(2.1));
+    CHECK(p2.z() == TestType(3.1));
+}
+
+///////////////////////////////////////////////////////////////////////////
+// Vector3 validity 
+///////////////////////////////////////////////////////////////////////////
+
+TEMPLATE_TEST_CASE("Check Vector 3 validity routines", "[Vector3]", float, double)
+{
+    SECTION("Valid")
+    {
+        for (auto x : gSetup.getValid<TestType>())
+        {
+            for (auto y : gSetup.getValid<TestType>())
+            {
+                for (auto z : gSetup.getValid<TestType>())
+                {
+                    hubert::Vector3<TestType> p1{ x, y, z };
+
+                    CHECK(p1.amValid() == true);
+                    CHECK(p1.amDegenerate() == false);
+
+                    // we have already run the isValid test - so assuming it works, 
+                    // this does too
+                    bool tv = hubert::isSubnormal(x) || hubert::isSubnormal(y) || hubert::isSubnormal(z);
+                    CHECK(p1.amSubnormal() == tv);
+                }
+            }
+        }
+    } 
+
+    SECTION("Invalid")
+    {
+        for (auto x : gSetup.getInvalid<TestType>())
+        {
+            for (auto y : gSetup.getInvalid<TestType>())
+            {
+                for (auto z : gSetup.getInvalid<TestType>())
+                {
+                    hubert::Vector3<TestType> p1{ x, y, z };
+
+                    CHECK(p1.amValid() == false);
+                    CHECK(p1.amDegenerate() == true);
+                    CHECK(p1.amSubnormal() == false);
+                }
+            }
+        }
+    }
+}

@@ -217,6 +217,7 @@ class Vector3 : public HubertBase
             {
                 newFlags |= cSubnormalData;
             }
+
             if (!(isValid(_x) && isValid(_y) && isValid(_z)))
             {
                 newFlags |= cInvalid;
@@ -234,11 +235,6 @@ class Vector3 : public HubertBase
                 {
                     // this picks up overflow
                     _mag = infinity<T>();
-                }
-
-                if (!isValid(_mag) || isEqual(_mag, T(0.0)))
-                {
-                    newFlags |= cDegenerate;
                 }
             }
             else
@@ -516,9 +512,15 @@ inline Point3<T> invalidPoint3()
 }
 
 template <typename T>
-inline Point3<T> invalidVector3()
+inline Vector3<T> invalidVector3()
 {
-    return Point3<T>(infinity<T>(), infinity<T>(), infinity<T>());
+    return Vector3<T>(infinity<T>(), infinity<T>(), infinity<T>());
+}
+
+template <typename T>
+inline UnitVector3<T> invalidUnitVector3()
+{
+    return UnitVector3<T>(infinity<T>(), infinity<T>(), infinity<T>());
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -853,6 +855,37 @@ template <typename T>
 inline T magnitude(const UnitVector3<T>& v)
 {
     return T(1.0);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// normal functions
+/////////////////////////////////////////////////////////////////////////////
+
+template <typename T>
+inline UnitVector3<T> unitNormal(const Triangle3<T> & tri)
+{
+    // degenerate triangles do not have normals
+    if (isDegenerate(tri))
+    {
+        return invalidUnitVector3<T>();
+    }
+
+    // Ordering of points is not arbitrary. This follows from the hubert
+    // convention for a triangle
+    Vector3<T> v1 = tri.p2() - tri.p1();
+    Vector3<T> v2 = tri.p3() - tri.p1();
+
+    Vector3<T> norm = crossProduct(v1, v2);
+    if (!isValid(norm))
+    {
+        return invalidUnitVector3<T>();
+    }
+
+    // the unit normal could be degenerate (e.g. zero length or overflow)
+    // but it is up to the caller to detect that and deal with it.
+    UnitVector3<T> unorm = makeUnitVector3(norm);
+
+    return unorm;
 }
 
 
