@@ -993,7 +993,7 @@ inline T area(const Triangle3<T>& tri)
     T cz = dx1 * dy2 - dx2 * dy1;
 
     // the above calculations can overflow
-    if (!(isValid(sx) && isValid(cy) && isValid(cz)))
+    if (!(isValid(cx) && isValid(cy) && isValid(cz)))
     {
         return infinity<T>();
     }
