@@ -688,7 +688,7 @@ TEMPLATE_TEST_CASE("Check Vector3 magnitude function", "[Vector3]", float, doubl
     SECTION("Valid inexact")
     {
         hubert::Vector3<TestType> p1{ TestType(2.1), TestType(3.1), TestType(4.1) };
-        CHECK(hubert::isEqual(p1.magnitude(), sqrt(TestType(2.1) * TestType(2.1) + TestType(3.1) * TestType(3.1) + TestType(4.1) * TestType(4.1))));
+        CHECK(hubert::isEqual(p1.magnitude(), std::hypot(TestType(2.1), TestType(3.1), TestType(4.1))));
     }
 
     SECTION("Invalid")
