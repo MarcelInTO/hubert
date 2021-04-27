@@ -779,7 +779,7 @@ TEMPLATE_TEST_CASE("Check UnitVector3 validity routines", "[UnitVector3]", float
                 {
                     hubert::UnitVector3<TestType> p1{ x, y, z };
 
-                    TestType len = std::sqrt(x * x + y * y + z * z);
+                    TestType len = std::hypot(x, y, z);
 
                     if (hubert::isEqual(len, TestType(0.0)))
                     {
@@ -794,7 +794,7 @@ TEMPLATE_TEST_CASE("Check UnitVector3 validity routines", "[UnitVector3]", float
                     }
                     else
                     {
-                        TestType nlen = std::sqrt(p1.x() * p1.x() + p1.y() * p1.y() + p1.z() * p1.z());
+                        TestType nlen = std::hypot(p1.x(), p1.y(), + p1.z());
                         CHECK(hubert::isEqual(nlen, TestType(1.0)));
                         CHECK(p1.amValid() == true);
                         CHECK(p1.amDegenerate() == false);

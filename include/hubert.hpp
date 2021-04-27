@@ -280,16 +280,7 @@ class UnitVector3 : public HubertBase
                     newFlags |= cSubnormalData;
                 }
 
-                T mag = _x * _x + _y * _y + _z * _z;
-                if (isValid(mag))
-                {
-                    mag = sqrt(mag);
-                }
-                else
-                {
-                    // this picks up overflow
-                    mag = infinity<T>();
-                }
+                T mag = std::hypot(_x, _y, _z);
            
                 if (!isValid(mag) || isEqual(mag, T(0.0)))
                 {
@@ -799,16 +790,11 @@ inline T distance(const Point3<T> & p1, const Point3<T> & p2)
     T dx = p1.x() - p2.x();
     T dy = p1.y() - p2.y();
     T dz = p1.z() - p2.z();
-    T tot = dx*dx + dy*dy + dz*dz;
 
-    // if a Nan came in, this will convert it to an infinity
-    if (!isValid(tot))
-    {
-        return infinity<T>();
-    }
+    T tot = std::hypot(dx, dy, dz);
 
-    return std::sqrt(tot);
-}
+    return tot;
+ }
 
 template <typename T>
 inline T distance(const Point3<T> & thePoint, const Plane<T> & thePlane)
@@ -834,7 +820,7 @@ inline T magnitude(const Vector3<T>& v)
         return infinity<T>();
     }
 
-    return std::sqrt(v.x() * v.x() + v.y() * v.y() + v.z() * v.z());
+    return std::hypot(v.x(), v.y(), v.z());
 }
 
 template <typename T>
@@ -1006,7 +992,14 @@ inline T area(const Triangle3<T>& tri)
     T cy = dx2 * dz1 - dx1 * dz2;
     T cz = dx1 * dy2 - dx2 * dy1;
 
-    return std::sqrt(cx * cx + cy * cy + cz * cz) * T(0.5);
+    // the above calculations can overflow
+    if (!(isValid(sx) && isValid(cy) && isValid(cz)))
+    {
+        return infinity<T>();
+    }
+
+    // hypot() will return inifinity if it overflows
+    return std::hypot(cx, cy, cz) * T(0.5);
 }
 
 /////////////////////////////////////////////////////////////////////////////
