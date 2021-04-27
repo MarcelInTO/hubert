@@ -226,16 +226,7 @@ class Vector3 : public HubertBase
             // only do degeneracy checks if valid
             if (!(newFlags & cInvalid))
             {
-                _mag = _x * _x + _y * _y + _z * _z;
-                if (isValid(_mag))
-                {
-                    _mag = sqrt(_mag);
-                }
-                else
-                {
-                    // this picks up overflow
-                    _mag = infinity<T>();
-                }
+                _mag = std::hypot(_x, _y, _z);
             }
             else
             {
@@ -333,7 +324,7 @@ class Line3 : public HubertBase
 {
     public:
         // constructors
-        Line3() { _normalizeAndValidate(_p1(T(0.0), T(0.0), T(0.0)), _p2(T(1.0), T(1.0), T(1.0))); }
+        Line3() : Line3(Point3(T(0.0), T(0.0), T(0.0)), Point3(T(1.0), T(1.0), T(1.0))) {}
         Line3(const Point3<T> & inP1, const Point3<T> & inP2) { _normalizeAndValidate(inP1, inP2); }
         Line3(const Line3 &) = default;
         ~Line3() = default;
@@ -344,7 +335,8 @@ class Line3 : public HubertBase
         // public methods
         inline const Point3<T> & base() const { return _base; }
         inline const Point3<T> & target() const { return _target; }
-        inline const UnitVector3<T> & direction() const { return _direction; }
+        inline const UnitVector3<T>& unitDirection() const { return _unitDirection; }
+        inline const Vector3<T>& fullDirection() const { return _fullDirection; }
 
 
     private:
@@ -357,6 +349,8 @@ class Line3 : public HubertBase
             if (!(isValid(p1) && isValid(p2)))
             {
                 newFlags |= cInvalid;
+                _fullDirection = Vector3<T>(infinity<T>(), infinity<T>(), infinity<T>());
+                _unitDirection = UnitVector3<T>(infinity<T>(), infinity<T>(), infinity<T>());
             }
             else {
                 // if subnormal, we will do the calculations, but set the subnormal flag
@@ -370,28 +364,19 @@ class Line3 : public HubertBase
                 if (isEqual(distance(p1, p2), T(0.0)))
                 {
                     newFlags |= cDegenerate;
+                    _fullDirection = Vector3<T>(infinity<T>(), infinity<T>(), infinity<T>());
+                    _unitDirection = UnitVector3<T>(infinity<T>(), infinity<T>(), infinity<T>());
                 }
                 else
                 {
                     _base = p1;
                     _target = p2;
-                    _direction = UnitVector3<T>(p2.x() - p1.x(), p2.y() - p1.y(), p2.z() - p1.z());
+                    _fullDirection = Vector3<T>(p2.x() - p1.x(), p2.y() - p1.y(), p2.z() - p1.z());
+                    _unitDirection = makeUnitVector3(_fullDirection);
                 }
 
-                // one last check
-
-                if (!(newFlags & cDegenerate))
-                {
-                    if (isDegenerate(_direction))
-                    {
-                        newFlags |= cDegenerate;
-                    }
-                }
-
-                if (isSubnormal(_direction))
-                {
-                    newFlags |= cSubnormalData;
-                }
+                // while the points are valid and not degenerate, it is still possible to end up
+                // with a degenerate vector if there is overflow, but we consider the line to be fine.
             }
 
             setValidityFlags(newFlags);
@@ -399,7 +384,8 @@ class Line3 : public HubertBase
         
         Point3<T>       _base;
         Point3<T>       _target;
-        UnitVector3<T>  _direction;
+        Vector3<T>  _fullDirection;
+        UnitVector3<T>  _unitDirection;
 };
 
 template <typename T>
@@ -440,7 +426,7 @@ class Ray3 : public HubertBase
 
         // public medthods
         inline const Point3<T>& base() const { return _base; }
-        inline const UnitVector3<T>& direction() const { return _direction; }
+        inline const UnitVector3<T>& unitDirection() const { return _direction; }
 
     private:
         Point3<T>       _base;
@@ -898,9 +884,9 @@ inline Point3<T> closestPoint(const Line3<T> & theLine, const Point3<T> & thePoi
 {
     Vector3<T> v2 = makeVector3(theLine.base(), thePoint);
 
-    T f = dotProduct(theLine.direction(), v2) ;
+    T f = dotProduct(theLine.unitDirection(), v2) ;
 
-    return theLine.base() + multiply(theLine.direction(), f);
+    return theLine.base() + multiply(theLine.unitDirection(), f);
 }
 
 template <typename T>
@@ -1056,7 +1042,7 @@ inline ResultCode intersect(const Plane<T> & thePlane, const Line3<T> & theLine,
     }
 
     // check for parallel or coplanar
-    T dp = dotProduct(theLine.direction(), thePlane.up());
+    T dp = dotProduct(theLine.unitDirection(), thePlane.up());
     if (isEqual(dp, T(0.0)))
     {
         if (isEqual(distance(theLine.base(), thePlane), T(0.0)))
@@ -1073,8 +1059,8 @@ inline ResultCode intersect(const Plane<T> & thePlane, const Line3<T> & theLine,
 
     // inputs are valid and we are not parallel
     // from https://en.wikipedia.org/wiki/Line%E2%80%93plane_intersection
-    T d = dotProduct(thePlane.base() - theLine.base(), thePlane.up()) / dotProduct(theLine.direction(), thePlane.up());
-    intersection = theLine.base() + multiply(theLine.direction(), d);
+    T d = dotProduct(thePlane.base() - theLine.base(), thePlane.up()) / dotProduct(theLine.unitDirection(), thePlane.up());
+    intersection = theLine.base() + multiply(theLine.unitDirection(), d);
 
     if (!isValid(intersection))
     {
@@ -1102,7 +1088,7 @@ inline ResultCode intersect(const Plane<T>& thePlane, const Ray3<T>& theRay, Poi
     }
 
     // check for parallel or coplanar
-    T dp = dotProduct(theRay.direction(), thePlane.up());
+    T dp = dotProduct(theRay.unitDirection(), thePlane.up());
     if (isEqual(dp, T(0.0)))
     {
         if (isEqual(distance(theRay.base(), thePlane), T(0.0)))
@@ -1119,7 +1105,7 @@ inline ResultCode intersect(const Plane<T>& thePlane, const Ray3<T>& theRay, Poi
 
     // inputs are valid and we are not parallel
     // from https://en.wikipedia.org/wiki/Line%E2%80%93plane_intersection
-    T d = dotProduct(thePlane.base() - theRay.base(), thePlane.up()) / dotProduct(theRay.direction(), thePlane.up());
+    T d = dotProduct(thePlane.base() - theRay.base(), thePlane.up()) / dotProduct(theRay.unitDirection(), thePlane.up());
 
     // 0.0 would be touching, which is an interseciton, so we don't need to do a epsilon compare
     if (d < 0.0)
@@ -1128,7 +1114,7 @@ inline ResultCode intersect(const Plane<T>& thePlane, const Ray3<T>& theRay, Poi
         return ResultCode::eNoIntersection;
     }
 
-    intersection = theRay.base() + multiply(theRay.direction(), d);
+    intersection = theRay.base() + multiply(theRay.unitDirection(), d);
 
     if (!isValid(intersection))
     {
@@ -1217,7 +1203,7 @@ inline ResultCode intersect(const Triangle3<T> & theTri,  const Ray3<T> & theRay
     Vector3<T> edge1 = theTri.p2() - theTri.p1();
     Vector3<T> edge2 = theTri.p3() - theTri.p1();
 
-    Vector3<T> pvec = crossProduct(theRay.direction(), edge2);
+    Vector3<T> pvec = crossProduct(theRay.unitDirection(), edge2);
 
     T det = dotProduct(edge1, pvec);
     if (isEqual(det, T(0.0)))
@@ -1237,7 +1223,7 @@ inline ResultCode intersect(const Triangle3<T> & theTri,  const Ray3<T> & theRay
 
     Vector3<T> qvec = crossProduct(tvec, edge1);
 
-    T v =  dotProduct(theRay.direction(), qvec) / det;
+    T v =  dotProduct(theRay.unitDirection(), qvec) / det;
     if (!(isGreaterOrEqual(v, T(0.0)) && isLessOrEqual(u + v, T(1.0))))
     {
         intersection = invalidPoint3<T>();
@@ -1251,7 +1237,7 @@ inline ResultCode intersect(const Triangle3<T> & theTri,  const Ray3<T> & theRay
         return ResultCode::eNoIntersection;
     }
 
-    intersection = theRay.base() + multiply(theRay.direction(), t);
+    intersection = theRay.base() + multiply(theRay.unitDirection(), t);
 
     if (!isValid(intersection))
     {
@@ -1283,7 +1269,7 @@ inline ResultCode intersect(const Triangle3<T> & theTri,  const Line3<T> & theLi
     Vector3<T> edge1 = theTri.p2() - theTri.p1();
     Vector3<T> edge2 = theTri.p3() - theTri.p1();
 
-    Vector3<T> pvec = crossProduct(theLine.direction(), edge2);
+    Vector3<T> pvec = crossProduct(theLine.unitDirection(), edge2);
 
     T det = dotProduct(edge1, pvec);
     if (isEqual(det, T(0.0)))
@@ -1303,7 +1289,7 @@ inline ResultCode intersect(const Triangle3<T> & theTri,  const Line3<T> & theLi
 
     Vector3<T> qvec = crossProduct(tvec, edge1);
 
-    T v =  dotProduct(theLine.direction(), qvec) / det;
+    T v =  dotProduct(theLine.unitDirection(), qvec) / det;
     if (!(isGreaterOrEqual(v, T(0.0)) && isLessOrEqual(u + v, T(1.0))))
     {
         intersection = invalidPoint3<T>();
@@ -1311,7 +1297,7 @@ inline ResultCode intersect(const Triangle3<T> & theTri,  const Line3<T> & theLi
     }
 
     T t = dotProduct(edge2, qvec) / det;
-    intersection = theLine.base() + multiply(theLine.direction(), t);
+    intersection = theLine.base() + multiply(theLine.unitDirection(), t);
 
     if (!isValid(intersection))
     {
