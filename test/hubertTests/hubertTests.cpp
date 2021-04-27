@@ -972,6 +972,14 @@ TEMPLATE_TEST_CASE("Check Line3 validity routines", "[Line3]", float, double)
 
                     hubert::Line3<TestType> theLine(p1, p2);
 
+                    // regardless of the validity, the input data should be preserved
+                    CHECK(theLine.base().x() == p1.x());
+                    CHECK(theLine.base().y() == p1.y());
+                    CHECK(theLine.base().z() == p1.z());
+                    CHECK(theLine.target().x() == p2.x());
+                    CHECK(theLine.target().y() == p2.y());
+                    CHECK(theLine.target().z() == p2.z());
+
                     CHECK(theLine.amValid() == true);
                     if (hubert::isEqual(hubert::distance(p1, p2), TestType(0.0)))
                     {
@@ -1018,6 +1026,15 @@ TEMPLATE_TEST_CASE("Check Line3 validity routines", "[Line3]", float, double)
 
                                 hubert::Line3<TestType> theLine(p1, p2);
 
+                                // regardless of the validity, the input data should be preserved
+
+                                CHECK(((std::isnan(theLine.base().x()) && std::isnan(p1.x())) || (theLine.base().x() == p1.x())));
+                                CHECK(((std::isnan(theLine.base().y()) && std::isnan(p1.y())) || (theLine.base().y() == p1.y())));
+                                CHECK(((std::isnan(theLine.base().z()) && std::isnan(p1.z())) || (theLine.base().z() == p1.z())));
+                                CHECK(((std::isnan(theLine.target().x()) && std::isnan(p2.x())) || (theLine.target().x() == p2.x())));
+                                CHECK(((std::isnan(theLine.target().y()) && std::isnan(p2.y())) || (theLine.target().y() == p2.y())));
+                                CHECK(((std::isnan(theLine.target().z()) && std::isnan(p2.z())) || (theLine.target().z() == p2.z())));
+
                                 CHECK(theLine.amValid() == false);
                                 CHECK(theLine.amDegenerate() == true);
                                 CHECK(theLine.amSubnormal() == false);
@@ -1032,3 +1049,186 @@ TEMPLATE_TEST_CASE("Check Line3 validity routines", "[Line3]", float, double)
         }
     }
 }
+
+///////////////////////////////////////////////////////////////////////////
+// Plane construction tests 
+///////////////////////////////////////////////////////////////////////////
+
+TEMPLATE_TEST_CASE("Construct Plane with default parameters", "[Plane]", float, double)
+{
+    hubert::Plane<TestType> thePlane;
+
+    CHECK(thePlane.base().x() == TestType(0.0));
+    CHECK(thePlane.base().y() == TestType(0.0));
+    CHECK(thePlane.base().z() == TestType(0.0));
+    CHECK(thePlane.up().x() == TestType(0.0));
+    CHECK(thePlane.up().y() == TestType(0.0));
+    CHECK(thePlane.up().z() == TestType(1.0));
+}
+
+
+TEMPLATE_TEST_CASE("Construct Plane with constant parameters", "[Plane]", float, double)
+{
+    hubert::Point3<TestType> p1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::Vector3<TestType> v1(TestType(-7.3), TestType(3.2), TestType(-3.2));
+    hubert::UnitVector3<TestType> uv1(v1.x(), v1.y(), v1.z());
+
+    hubert::Plane<TestType> theLine(p1, uv1);
+
+    CHECK(theLine.base().x() == p1.x());
+    CHECK(theLine.base().y() == p1.y());
+    CHECK(theLine.base().z() == p1.z());
+
+    CHECK(hubert::isEqual(theLine.up().x(), v1.x() / v1.magnitude()));
+    CHECK(hubert::isEqual(theLine.up().y(), v1.y() / v1.magnitude()));
+    CHECK(hubert::isEqual(theLine.up().z(), v1.z() / v1.magnitude()));
+}
+
+
+TEMPLATE_TEST_CASE("Construct Plane with copy  constructor", "[Plane]", float, double)
+{
+    hubert::Point3<TestType> p1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::Vector3<TestType> v1(TestType(-7.3), TestType(3.2), TestType(-3.2));
+    hubert::UnitVector3<TestType> uv1(v1.x(), v1.y(), v1.z());
+
+    hubert::Plane<TestType> sourceLine(p1, uv1);
+    hubert::Plane<TestType> theLine(sourceLine);
+
+    CHECK(theLine.base().x() == p1.x());
+    CHECK(theLine.base().y() == p1.y());
+    CHECK(theLine.base().z() == p1.z());
+
+    CHECK(hubert::isEqual(theLine.up().x(), v1.x() / v1.magnitude()));
+    CHECK(hubert::isEqual(theLine.up().y(), v1.y() / v1.magnitude()));
+    CHECK(hubert::isEqual(theLine.up().z(), v1.z() / v1.magnitude()));
+}
+
+
+TEMPLATE_TEST_CASE("Construct Plane with assignment", "[Plane]", float, double)
+{
+    hubert::Point3<TestType> p1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::Vector3<TestType> v1(TestType(-7.3), TestType(3.2), TestType(-3.2));
+    hubert::UnitVector3<TestType> uv1(v1.x(), v1.y(), v1.z());
+
+    hubert::Plane<TestType> sourceLine(p1, uv1);
+    hubert::Plane<TestType> theLine = sourceLine;
+
+    CHECK(theLine.base().x() == p1.x());
+    CHECK(theLine.base().y() == p1.y());
+    CHECK(theLine.base().z() == p1.z());
+
+    CHECK(hubert::isEqual(theLine.up().x(), v1.x() / v1.magnitude()));
+    CHECK(hubert::isEqual(theLine.up().y(), v1.y() / v1.magnitude()));
+    CHECK(hubert::isEqual(theLine.up().z(), v1.z() / v1.magnitude()));
+}
+
+
+TEMPLATE_TEST_CASE("Construct Plane with initializer", "[Plane]", float, double)
+{
+    hubert::Point3<TestType> p1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::Vector3<TestType> v1(TestType(-7.3), TestType(3.2), TestType(-3.2));
+    hubert::UnitVector3<TestType> uv1(v1.x(), v1.y(), v1.z());
+
+    hubert::Plane<TestType> theLine { p1, uv1 };
+
+    CHECK(theLine.base().x() == p1.x());
+    CHECK(theLine.base().y() == p1.y());
+    CHECK(theLine.base().z() == p1.z());
+
+    CHECK(hubert::isEqual(theLine.up().x(), v1.x() / v1.magnitude()));
+    CHECK(hubert::isEqual(theLine.up().y(), v1.y() / v1.magnitude()));
+    CHECK(hubert::isEqual(theLine.up().z(), v1.z() / v1.magnitude()));
+}
+
+///////////////////////////////////////////////////////////////////////////
+// Plane validity 
+///////////////////////////////////////////////////////////////////////////
+
+TEMPLATE_TEST_CASE("Check Plane validity routines", "[Plane]", float, double)
+{
+    SECTION("Valid")
+    {
+        for (auto x1 : gSetup.getValid<TestType>())
+        {
+            for (auto y1 : gSetup.getValid<TestType>())
+            {
+                for (auto z1 : gSetup.getValid<TestType>())
+                {
+                    auto x2 = y1;
+                    auto y2 = z1;
+                    auto z2 = x1;
+
+                    hubert::Point3<TestType> p1{ x1, y1, z1 };
+                    hubert::Vector3<TestType> sv1{ x2, y2, z2 };
+                    hubert::UnitVector3<TestType> v1 = hubert::makeUnitVector3(sv1);
+
+                    hubert::Plane<TestType> thePlane(p1, v1);
+
+                    // regardless of validity, input numbers should not be modified
+                    CHECK(thePlane.base().x() == p1.x());
+                    CHECK(thePlane.base().y() == p1.y());
+                    CHECK(thePlane.base().z() == p1.z());
+
+                    CHECK(hubert::isEqual(thePlane.up().x(), v1.x()));
+                    CHECK(hubert::isEqual(thePlane.up().y(), v1.y()));
+                    CHECK(hubert::isEqual(thePlane.up().z(), v1.z()));
+
+                    // if the numbers are valid, then the plane can only be degenerate if 
+                    // the normal is degenerate
+                    CHECK(thePlane.amValid());
+                    if (v1.amDegenerate())
+                    {
+                        CHECK(thePlane.amDegenerate());
+                    }
+                    else
+                    {
+                        CHECK_FALSE(thePlane.amDegenerate());
+                    }
+
+                    // we have already run the isValid test - so assuming it works, 
+                    // this does too
+                    bool tv = hubert::isSubnormal(p1) || hubert::isSubnormal(v1);
+                    CHECK(thePlane.amSubnormal() == tv);
+                }
+            }
+        }
+    }
+
+    SECTION("Invalid")
+    {
+        for (auto x1 : gSetup.getInvalid<TestType>())
+        {
+            for (auto y1 : gSetup.getInvalid<TestType>())
+            {
+                for (auto z1 : gSetup.getInvalid<TestType>())
+                {
+                    for (auto x2 : gSetup.getInvalid<TestType>())
+                    {
+                        for (auto y2 : gSetup.getInvalid<TestType>())
+                        {
+                            for (auto z2 : gSetup.getInvalid<TestType>())
+                            {
+                                hubert::Point3<TestType> p1{ x1, y1, z1 };
+                                hubert::UnitVector3<TestType> v1{ x2, y2, z2 };
+
+                                hubert::Plane<TestType> thePlane(p1, v1);
+
+                                CHECK_FALSE(p1.amValid());
+                                CHECK(p1.amDegenerate());
+
+                                CHECK_FALSE(v1.amValid());
+                                CHECK(v1.amDegenerate());
+
+                                CHECK_FALSE(thePlane.amValid());
+                                CHECK(thePlane.amDegenerate());
+                                CHECK_FALSE(thePlane.amSubnormal());
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+

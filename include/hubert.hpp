@@ -336,6 +336,10 @@ class Line3 : public HubertBase
         {
             uint64_t newFlags = 0;
 
+            // non calulated data is preserved as is
+            _base = p1;
+            _target = p2;
+
             // only do normalization and degeneracy checks if valid
             if (!(isValid(p1) && isValid(p2)))
             {
@@ -385,7 +389,7 @@ class Plane : public HubertBase
     public:
         // constructors
         Plane() : Plane(Point3<T>(T(0.0), T(0.0), T(0.0)), UnitVector3<T>(T(0.0), T(0.0), T(1.0))) {}
-        Plane(const Point3<T> & p, const UnitVector3<T> & v) : _base(p), _up(v) {}
+        Plane(const Point3<T> & p, const UnitVector3<T>& v) { _validate(p, v);  }
         Plane(const Plane &) = default;
         ~Plane() = default;
 
@@ -397,6 +401,36 @@ class Plane : public HubertBase
         inline const UnitVector3<T>& up() const { return _up; }
 
     private:
+        void _validate(const Point3<T>& p, const UnitVector3<T>& v)
+        {
+            _base = p;
+            _up = v;
+
+            uint64_t newFlags = 0;
+
+            // only do normalization and degeneracy checks if valid
+            if (!(isValid(_base) && isValid(_up)))
+            {
+                newFlags |= cInvalid;
+            }
+            else {
+                // if subnormal, we will do the calculations, but set the subnormal flag
+                // so that everyone knows that the calculations are reduced precision
+                if (isSubnormal(_base) || isSubnormal(_up))
+                {
+                    newFlags |= cSubnormalData;
+                }
+
+                if (isDegenerate(_up))
+                {
+                    newFlags |= cDegenerate;
+                }
+            }
+
+            setValidityFlags(newFlags);
+        }
+
+
         // public data
         Point3<T>       _base;
         UnitVector3<T>  _up;
