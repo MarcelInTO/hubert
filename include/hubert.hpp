@@ -493,7 +493,7 @@ class Segment3 : public HubertBase
     public:
         // constructors
         Segment3() : Segment3(Point3<T>(T(0.0), T(0.0), T(0.0)), Point3<T>(T(1.0), T(1.0), T(1.0))) {}
-        Segment3(const Point3<T> & inP1, const Point3<T> & inP2) : _p1(inP1), _p2(inP2) {}
+        Segment3(const Point3<T>& inP1, const Point3<T>& inP2) { _validate(inP1, inP2); }
         Segment3(const Segment3 &) = default;
         ~Segment3() = default;
 
@@ -501,13 +501,43 @@ class Segment3 : public HubertBase
         inline Segment3<T> & operator=(const Segment3<T> &) = default;
 
         // public methods
-        inline const Point3<T> & base() const { return _p1; }
-        inline const Point3<T> & target() const { return _p2; }
+        inline const Point3<T> & base() const { return _base; }
+        inline const Point3<T> & target() const { return _target; }
 
     private:
+        void _validate(const Point3<T>& p1, const Point3<T>& p2)
+        {
+            _base = p1;
+            _target = p2;
+
+            uint64_t newFlags = 0;
+
+            // only do subnormal and degeneracy checks if valid
+            if (!(isValid(_base) && isValid(_target)))
+            {
+                newFlags |= cInvalid;
+            }
+            else {
+                // if subnormal, we will do the calculations, but set the subnormal flag
+                // so that everyone knows that the calculations are reduced precision
+                if (isSubnormal(_base) || isSubnormal(_target))
+                {
+                    newFlags |= cSubnormalData;
+                }
+
+                T dist = distance(p1, p2);
+                if (isEqual(dist, T(0.0)) || !isValid(dist))
+                {
+                    newFlags |= cDegenerate;
+                }
+            }
+
+            setValidityFlags(newFlags);
+        }
+
         //private data
-        Point3<T>   _p1;
-        Point3<T>   _p2;
+        Point3<T>   _base;
+        Point3<T>   _target;
 };
 
 template <typename T>

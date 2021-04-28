@@ -1428,3 +1428,174 @@ TEMPLATE_TEST_CASE("Check Ray3 validity routines", "[Ray3]", float, double)
     }
 }
 
+///////////////////////////////////////////////////////////////////////////
+// Segment3 construction tests 
+///////////////////////////////////////////////////////////////////////////
+
+TEMPLATE_TEST_CASE("Construct Segment3 with default parameters", "[Segment3]", float, double)
+{
+    hubert::Segment3<TestType> theSegment;
+
+    CHECK(theSegment.base().x() == TestType(0.0));
+    CHECK(theSegment.base().y() == TestType(0.0));
+    CHECK(theSegment.base().z() == TestType(0.0));
+    CHECK(theSegment.target().x() == TestType(1.0));
+    CHECK(theSegment.target().y() == TestType(1.0));
+    CHECK(theSegment.target().z() == TestType(1.0));
+}
+
+
+TEMPLATE_TEST_CASE("Construct Segment3 with constant parameters", "[Segment3]", float, double)
+{
+    hubert::Point3<TestType> p1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::Point3<TestType> p2(TestType(-7.3), TestType(3.2), TestType(-3.2));
+
+    hubert::Segment3<TestType> theSegment(p1, p2);
+
+    CHECK(theSegment.base().x() == p1.x());
+    CHECK(theSegment.base().y() == p1.y());
+    CHECK(theSegment.base().z() == p1.z());
+    CHECK(theSegment.target().x() == p2.x());
+    CHECK(theSegment.target().y() == p2.y());
+    CHECK(theSegment.target().z() == p2.z());
+}
+
+TEMPLATE_TEST_CASE("Construct Segment3 with copy  constructor", "[Segment3]", float, double)
+{
+    hubert::Point3<TestType> p1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::Point3<TestType> p2(TestType(-7.3), TestType(3.2), TestType(-3.2));
+
+    hubert::Segment3<TestType> sourceLine(p1, p2);
+    hubert::Segment3<TestType> theSegment(sourceLine);
+
+    CHECK(theSegment.base().x() == p1.x());
+    CHECK(theSegment.base().y() == p1.y());
+    CHECK(theSegment.base().z() == p1.z());
+    CHECK(theSegment.target().x() == p2.x());
+    CHECK(theSegment.target().y() == p2.y());
+    CHECK(theSegment.target().z() == p2.z());
+}
+
+TEMPLATE_TEST_CASE("Construct Segment3 with assignment", "[Segment3]", float, double)
+{
+    hubert::Point3<TestType> p1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::Point3<TestType> p2(TestType(-7.3), TestType(3.2), TestType(-3.2));
+
+    hubert::Segment3<TestType> sourceLine(p1, p2);
+    hubert::Segment3<TestType> theSegment = sourceLine;
+
+    CHECK(theSegment.base().x() == p1.x());
+    CHECK(theSegment.base().y() == p1.y());
+    CHECK(theSegment.base().z() == p1.z());
+    CHECK(theSegment.target().x() == p2.x());
+    CHECK(theSegment.target().y() == p2.y());
+    CHECK(theSegment.target().z() == p2.z());
+}
+
+TEMPLATE_TEST_CASE("Construct Segment3 with initializer", "[Segment3]", float, double)
+{
+    hubert::Point3<TestType> p1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::Point3<TestType> p2(TestType(-7.3), TestType(3.2), TestType(-3.2));
+
+    hubert::Segment3<TestType> theSegment{ p1, p2 };
+
+    CHECK(theSegment.base().x() == p1.x());
+    CHECK(theSegment.base().y() == p1.y());
+    CHECK(theSegment.base().z() == p1.z());
+    CHECK(theSegment.target().x() == p2.x());
+    CHECK(theSegment.target().y() == p2.y());
+    CHECK(theSegment.target().z() == p2.z());
+}
+
+///////////////////////////////////////////////////////////////////////////
+// Segment3 validity 
+///////////////////////////////////////////////////////////////////////////
+
+TEMPLATE_TEST_CASE("Check Segment3 validity routines", "[Segment3]", float, double)
+{
+    SECTION("Valid")
+    {
+        for (auto x1 : gSetup.getValid<TestType>())
+        {
+            for (auto y1 : gSetup.getValid<TestType>())
+            {
+                for (auto z1 : gSetup.getValid<TestType>())
+                {
+                    auto x2 = y1;
+                    auto y2 = z1;
+                    auto z2 = x1;
+
+                    hubert::Point3<TestType> p1{ x1, y1, z1 };
+                    hubert::Point3<TestType> p2{ x2, y2, z2 };
+
+                    hubert::Segment3<TestType> theSegment(p1, p2);
+
+                    // regardless of the validity, the input data should be preserved
+                    CHECK(theSegment.base().x() == p1.x());
+                    CHECK(theSegment.base().y() == p1.y());
+                    CHECK(theSegment.base().z() == p1.z());
+                    CHECK(theSegment.target().x() == p2.x());
+                    CHECK(theSegment.target().y() == p2.y());
+                    CHECK(theSegment.target().z() == p2.z());
+
+                    CHECK(theSegment.amValid() == true);
+
+                    TestType dist = hubert::distance(p1, p2);
+                    if (hubert::isEqual(dist, TestType(0.0)) || !hubert::isValid(dist))
+                    {
+                        CHECK(theSegment.amDegenerate());
+                    }
+                    else
+                    {
+                        CHECK_FALSE(theSegment.amDegenerate());
+                    }
+
+                    // we have already run the isValid test - so assuming it works, 
+                    // this does too
+                    bool tv = hubert::isSubnormal(p1) || hubert::isSubnormal(p2);
+                    CHECK(theSegment.amSubnormal() == tv);
+                }
+            }
+        }
+    }
+
+    SECTION("Invalid")
+    {
+        for (auto x1 : gSetup.getInvalid<TestType>())
+        {
+            for (auto y1 : gSetup.getInvalid<TestType>())
+            {
+                for (auto z1 : gSetup.getInvalid<TestType>())
+                {
+                    for (auto x2 : gSetup.getInvalid<TestType>())
+                    {
+                        for (auto y2 : gSetup.getInvalid<TestType>())
+                        {
+                            for (auto z2 : gSetup.getInvalid<TestType>())
+                            {
+                                hubert::Point3<TestType> p1{ x1, y1, z1 };
+                                hubert::Point3<TestType> p2{ x2, y2, z2 };
+
+                                hubert::Segment3<TestType> theSegment(p1, p2);
+
+                                // regardless of the validity, the input data should be preserved
+
+                                CHECK(((std::isnan(theSegment.base().x()) && std::isnan(p1.x())) || (theSegment.base().x() == p1.x())));
+                                CHECK(((std::isnan(theSegment.base().y()) && std::isnan(p1.y())) || (theSegment.base().y() == p1.y())));
+                                CHECK(((std::isnan(theSegment.base().z()) && std::isnan(p1.z())) || (theSegment.base().z() == p1.z())));
+                                CHECK(((std::isnan(theSegment.target().x()) && std::isnan(p2.x())) || (theSegment.target().x() == p2.x())));
+                                CHECK(((std::isnan(theSegment.target().y()) && std::isnan(p2.y())) || (theSegment.target().y() == p2.y())));
+                                CHECK(((std::isnan(theSegment.target().z()) && std::isnan(p2.z())) || (theSegment.target().z() == p2.z())));
+
+                                CHECK(theSegment.amValid() == false);
+                                CHECK(theSegment.amDegenerate() == true);
+                                CHECK(theSegment.amSubnormal() == false);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
