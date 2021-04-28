@@ -1173,9 +1173,12 @@ TEMPLATE_TEST_CASE("Check Plane validity routines", "[Plane]", float, double)
                     CHECK(hubert::isEqual(thePlane.up().y(), v1.y()));
                     CHECK(hubert::isEqual(thePlane.up().z(), v1.z()));
 
+                    // we know the plane is valid (as opposed to degenerate) because it was
+                    // directly constructed out of numbers known to be valid
+                    CHECK(thePlane.amValid());
+
                     // if the numbers are valid, then the plane can only be degenerate if 
                     // the normal is degenerate
-                    CHECK(thePlane.amValid());
                     if (v1.amDegenerate())
                     {
                         CHECK(thePlane.amDegenerate());
@@ -1223,6 +1226,199 @@ TEMPLATE_TEST_CASE("Check Plane validity routines", "[Plane]", float, double)
                                 CHECK(thePlane.amDegenerate());
                                 CHECK_FALSE(thePlane.amSubnormal());
 
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////
+// Ray3 construction tests 
+///////////////////////////////////////////////////////////////////////////
+
+TEMPLATE_TEST_CASE("Construct Ray3 with default parameters", "[Ray3]", float, double)
+{
+    hubert::Ray3<TestType> theLine;
+
+    CHECK(theLine.base().x() == TestType(0.0));
+    CHECK(theLine.base().y() == TestType(0.0));
+    CHECK(theLine.base().z() == TestType(0.0));
+    CHECK(theLine.unitDirection().x() == TestType(0.0));
+    CHECK(theLine.unitDirection().y() == TestType(0.0));
+    CHECK(theLine.unitDirection().z() == TestType(1.0));
+}
+
+TEMPLATE_TEST_CASE("Construct Ray3 with constant parameters", "[Ray3]", float, double)
+{
+    hubert::Point3<TestType> p1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::Point3<TestType> p2(TestType(-7.3), TestType(3.2), TestType(-3.2));
+
+    hubert::Vector3<TestType> v1(p2 - p1);
+    hubert::UnitVector3<TestType> uv1 = hubert::makeUnitVector3<TestType>(v1);
+
+    hubert::Ray3<TestType> theRay(p1, uv1);
+
+    CHECK(theRay.base().x() == p1.x());
+    CHECK(theRay.base().y() == p1.y());
+    CHECK(theRay.base().z() == p1.z());
+
+    TestType dist = hubert::distance(p1, p2);
+
+    CHECK(hubert::isEqual(theRay.unitDirection().x(), v1.x() / dist));
+    CHECK(hubert::isEqual(theRay.unitDirection().y(), v1.y() / dist));
+    CHECK(hubert::isEqual(theRay.unitDirection().z(), v1.z() / dist));
+}
+
+TEMPLATE_TEST_CASE("Construct Ray3 with copy  constructor", "[Ray3]", float, double)
+{
+    hubert::Point3<TestType> p1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::Point3<TestType> p2(TestType(-7.3), TestType(3.2), TestType(-3.2));
+
+    hubert::Vector3<TestType> v1(p2 - p1);
+    hubert::UnitVector3<TestType> uv1 = hubert::makeUnitVector3<TestType>(v1);
+
+    hubert::Ray3<TestType> sourceRay(p1, uv1);
+    hubert::Ray3<TestType> theRay(sourceRay);
+
+    CHECK(theRay.base().x() == p1.x());
+    CHECK(theRay.base().y() == p1.y());
+    CHECK(theRay.base().z() == p1.z());
+
+    TestType dist = hubert::distance(p1, p2);
+
+    CHECK(hubert::isEqual(theRay.unitDirection().x(), v1.x() / dist));
+    CHECK(hubert::isEqual(theRay.unitDirection().y(), v1.y() / dist));
+    CHECK(hubert::isEqual(theRay.unitDirection().z(), v1.z() / dist));
+}
+
+TEMPLATE_TEST_CASE("Construct Ray3 with assignment", "[Ray3]", float, double)
+{
+    hubert::Point3<TestType> p1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::Point3<TestType> p2(TestType(-7.3), TestType(3.2), TestType(-3.2));
+
+    hubert::Vector3<TestType> v1(p2 - p1);
+    hubert::UnitVector3<TestType> uv1 = hubert::makeUnitVector3<TestType>(v1);
+
+    hubert::Ray3<TestType> sourceRay(p1, uv1);
+    hubert::Ray3<TestType> theRay = sourceRay;
+
+    CHECK(theRay.base().x() == p1.x());
+    CHECK(theRay.base().y() == p1.y());
+    CHECK(theRay.base().z() == p1.z());
+
+    TestType dist = hubert::distance(p1, p2);
+
+    CHECK(hubert::isEqual(theRay.unitDirection().x(), v1.x() / dist));
+    CHECK(hubert::isEqual(theRay.unitDirection().y(), v1.y() / dist));
+    CHECK(hubert::isEqual(theRay.unitDirection().z(), v1.z() / dist));
+}
+
+TEMPLATE_TEST_CASE("Construct Ray3 with initializer", "[Ray3]", float, double)
+{
+    hubert::Point3<TestType> p1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::Point3<TestType> p2(TestType(-7.3), TestType(3.2), TestType(-3.2));
+
+    hubert::Vector3<TestType> v1(p2 - p1);
+    hubert::UnitVector3<TestType> uv1 = hubert::makeUnitVector3<TestType>(v1);
+
+    hubert::Ray3<TestType> theRay { p1, uv1 };
+
+    CHECK(theRay.base().x() == p1.x());
+    CHECK(theRay.base().y() == p1.y());
+    CHECK(theRay.base().z() == p1.z());
+
+    TestType dist = hubert::distance(p1, p2);
+
+    CHECK(hubert::isEqual(theRay.unitDirection().x(), v1.x() / dist));
+    CHECK(hubert::isEqual(theRay.unitDirection().y(), v1.y() / dist));
+    CHECK(hubert::isEqual(theRay.unitDirection().z(), v1.z() / dist));
+}
+
+///////////////////////////////////////////////////////////////////////////
+// Ray3 validity 
+///////////////////////////////////////////////////////////////////////////
+
+TEMPLATE_TEST_CASE("Check Ray3 validity routines", "[Ray3]", float, double)
+{
+    SECTION("Valid")
+    {
+        for (auto x1 : gSetup.getValid<TestType>())
+        {
+            for (auto y1 : gSetup.getValid<TestType>())
+            {
+                for (auto z1 : gSetup.getValid<TestType>())
+                {
+                    auto x2 = y1;
+                    auto y2 = z1;
+                    auto z2 = x1;
+
+                    hubert::Point3<TestType> p1{ x1, y1, z1 };
+                    hubert::Point3<TestType> p2{ x2, y2, z2 };
+
+                    hubert::Vector3<TestType> v1(x2, y2, z2);
+                    hubert::UnitVector3<TestType> uv1 = makeUnitVector3(v1);
+
+                    hubert::Ray3<TestType> theRay(p1, uv1);
+
+                    // regardless of the validity, the input data should be preserved
+                    CHECK(theRay.base().x() == p1.x());
+                    CHECK(theRay.base().y() == p1.y());
+                    CHECK(theRay.base().z() == p1.z());
+
+                    // we know the ray is valid (as opposed to degenerate) because it was
+                    // directly constructed out of numbers known to be valid
+                    CHECK(theRay.amValid());
+                    if (uv1.amDegenerate())
+                    {
+                        CHECK(theRay.amDegenerate());
+                    }
+                    else
+                    {
+                        CHECK_FALSE(theRay.amDegenerate());
+                    }
+
+                    // we have already run the isValid test - so assuming it works, 
+                    // this does too
+                    bool tv = hubert::isSubnormal(p1) || hubert::isSubnormal(v1) || hubert::isSubnormal(uv1);
+                    CHECK(theRay.amSubnormal() == tv);
+                }
+            }
+        }
+    }
+
+    SECTION("Invalid")
+    {
+        for (auto x1 : gSetup.getInvalid<TestType>())
+        {
+            for (auto y1 : gSetup.getInvalid<TestType>())
+            {
+                for (auto z1 : gSetup.getInvalid<TestType>())
+                {
+                    for (auto x2 : gSetup.getInvalid<TestType>())
+                    {
+                        for (auto y2 : gSetup.getInvalid<TestType>())
+                        {
+                            for (auto z2 : gSetup.getInvalid<TestType>())
+                            {
+                                hubert::Point3<TestType> p1{ x1, y1, z1 };
+                                hubert::UnitVector3<TestType> uv1{ x2, y2, z2 };
+
+                                hubert::Ray3<TestType> theRay(p1, uv1);
+
+                                // regardless of the validity, the input data should be preserved
+
+                                CHECK(((std::isnan(theRay.base().x()) && std::isnan(p1.x())) || (theRay.base().x() == p1.x())));
+                                CHECK(((std::isnan(theRay.base().y()) && std::isnan(p1.y())) || (theRay.base().y() == p1.y())));
+                                CHECK(((std::isnan(theRay.base().z()) && std::isnan(p1.z())) || (theRay.base().z() == p1.z())));
+
+                                CHECK(theRay.amValid() == false);
+                                CHECK(theRay.amDegenerate() == true);
+                                CHECK(theRay.amSubnormal() == false);
+
+                                CHECK_FALSE(hubert::isValid(theRay.unitDirection()));
                             }
                         }
                     }

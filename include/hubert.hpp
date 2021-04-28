@@ -442,7 +442,7 @@ class Ray3 : public HubertBase
     public:
         // constructors
         Ray3() : Ray3(Point3<T>(T(0.0), T(0.0), T(0.0)), UnitVector3<T>(T(0.0), T(0.0), T(1.0))) {}
-        Ray3(const Point3<T> & p, const UnitVector3<T> & v) : _base(p), _direction(v) {}
+        Ray3(const Point3<T>& p, const UnitVector3<T>& v) { _validate(p, v); }
         Ray3(const Ray3 &) = default;
         ~Ray3() = default;
 
@@ -451,9 +451,38 @@ class Ray3 : public HubertBase
 
         // public medthods
         inline const Point3<T>& base() const { return _base; }
-        inline const UnitVector3<T>& unitDirection() const { return _direction; }
+        inline const UnitVector3<T> & unitDirection() const { return _direction; }
 
     private:
+        void _validate(const Point3<T>& p, const UnitVector3<T>& v)
+        {
+            _base = p;
+            _direction = v;
+
+            uint64_t newFlags = 0;
+
+            // only do normalization and degeneracy checks if valid
+            if (!(isValid(_base) && isValid(_direction)))
+            {
+                newFlags |= cInvalid;
+            }
+            else {
+                // if subnormal, we will do the calculations, but set the subnormal flag
+                // so that everyone knows that the calculations are reduced precision
+                if (isSubnormal(_base) || isSubnormal(_direction))
+                {
+                    newFlags |= cSubnormalData;
+                }
+
+                if (isDegenerate(_direction))
+                {
+                    newFlags |= cDegenerate;
+                }
+            }
+
+            setValidityFlags(newFlags);
+        }
+
         Point3<T>       _base;
         UnitVector3<T>  _direction;
 };
