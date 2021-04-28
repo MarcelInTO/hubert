@@ -501,8 +501,8 @@ class Segment3 : public HubertBase
         inline Segment3<T> & operator=(const Segment3<T> &) = default;
 
         // public methods
-        inline const Point3<T> & p1() const { return _p1; }
-        inline const Point3<T> & p2() const { return _p2; }
+        inline const Point3<T> & base() const { return _p1; }
+        inline const Point3<T> & target() const { return _p2; }
 
     private:
         //private data
@@ -1197,13 +1197,13 @@ inline ResultCode intersect(const Plane<T>& thePlane, const Segment3<T>& theSegm
         return ResultCode::eDegenerate;
     }
 
-    UnitVector3<T> segDir = makeUnitVector3(theSegment.p2() - theSegment.p1());
+    UnitVector3<T> segDir = makeUnitVector3(theSegment.target() - theSegment.base());
 
     // check for parallel or coplanar
     T dp = dotProduct(segDir, thePlane.up());
     if (isEqual(dp, T(0.0)))
     {
-        if (isEqual(distance(theSegment.p1(), thePlane), T(0.0)))
+        if (isEqual(distance(theSegment.base(), thePlane), T(0.0)))
         {
             intersection = invalidPoint3<T>();
             return ResultCode::eCoplanar;
@@ -1217,16 +1217,16 @@ inline ResultCode intersect(const Plane<T>& thePlane, const Segment3<T>& theSegm
 
     // inputs are valid and we are not parallel
     // from https://en.wikipedia.org/wiki/Line%E2%80%93plane_intersection
-    T d = dotProduct(thePlane.base() - theSegment.p1(), thePlane.up()) / dotProduct(segDir, thePlane.up());
+    T d = dotProduct(thePlane.base() - theSegment.base(), thePlane.up()) / dotProduct(segDir, thePlane.up());
 
     // 0.0 would be touching, which is an interseciton, so we don't need to do a epsilon compare
-    if (d < 0.0 || d > distance(theSegment.p1(), theSegment.p2()))
+    if (d < 0.0 || d > distance(theSegment.base(), theSegment.target()))
     {
         intersection = invalidPoint3<T>();
         return ResultCode::eNoIntersection;
     }
 
-    intersection = theSegment.p1() + multiply(segDir, d);
+    intersection = theSegment.base() + multiply(segDir, d);
 
     if (!isValid(intersection))
     {
@@ -1387,7 +1387,7 @@ inline ResultCode intersect(const Triangle3<T>& theTri, const Segment3<T>& theSe
     Vector3<T> edge1 = theTri.p2() - theTri.p1();
     Vector3<T> edge2 = theTri.p3() - theTri.p1();
 
-    Vector3<T> pvec = crossProduct(makeUnitVector3(theSegment.p2() - theSegment.p1()), edge2);
+    Vector3<T> pvec = crossProduct(makeUnitVector3(theSegment.target() - theSegment.base()), edge2);
 
     T det = dotProduct(edge1, pvec);
     if (isEqual(det, T(0.0)))
@@ -1395,9 +1395,9 @@ inline ResultCode intersect(const Triangle3<T>& theTri, const Segment3<T>& theSe
         return ResultCode::eCoplanar;
     }
 
-    Vector3<T> tvec = theSegment.p1() - theTri.p1();
+    Vector3<T> tvec = theSegment.base() - theTri.p1();
 
-    UnitVector3<T> segDir = makeUnitVector3(theSegment.p2() - theSegment.p1());
+    UnitVector3<T> segDir = makeUnitVector3(theSegment.target() - theSegment.base());
 
 
     T u = dotProduct(tvec, pvec) / det;
@@ -1426,7 +1426,7 @@ inline ResultCode intersect(const Triangle3<T>& theTri, const Segment3<T>& theSe
         return ResultCode::eNoIntersection;
     }
 
-    intersection = theSegment.p1() + multiply(segDir, t);
+    intersection = theSegment.base() + multiply(segDir, t);
 
     if (!isValid(intersection))
     {
@@ -1436,7 +1436,7 @@ inline ResultCode intersect(const Triangle3<T>& theTri, const Segment3<T>& theSe
         return ResultCode::eOverflow;
     }
 
-    if (hubert::distance(intersection, theSegment.p1()) > hubert::distance(theSegment.p1(), theSegment.p2()))
+    if (hubert::distance(intersection, theSegment.base()) > hubert::distance(theSegment.base(), theSegment.target()))
     {
         intersection = invalidPoint3<T>();
         return ResultCode::eNoIntersection;
