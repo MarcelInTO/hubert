@@ -120,7 +120,7 @@ inline bool isSubnormal(const T & v)
 // Core type definitions
 /////////////////////////////////////////////////////////////////////////////
 
-// This class is the base for all entities. It is used to 
+// This class is the base class for all entities.
 class HubertBase
 {
     public:
@@ -145,6 +145,13 @@ class HubertBase
 
 };
 
+//
+// Point3.
+//
+// Is considered valid as long as the 3 components (x, y, z) are valid. 
+// 
+// There are no non-validity related degenerate cases for Point3.
+// 
 template <typename T>
 class Point3 : public HubertBase
 {
@@ -188,6 +195,16 @@ class Point3 : public HubertBase
 
 };
 
+//
+// Vector3.
+//
+// Is considered valid as long as the 3 components (x, y, z) are valid. 
+// 
+// There are no non-validity related degenerate cases for Vector3. Note
+// that while it may be possible to construct a valid Vector3 where the
+// magnitude overflows and is invalid, that is not considered a degenerate
+// vector.
+// 
 template <typename T>
 class Vector3 : public HubertBase
 {
@@ -243,6 +260,17 @@ class Vector3 : public HubertBase
         T   _mag;
 };
 
+//
+// UnitVector3.
+//
+// Is considered valid as long as the 3 components (x, y, z) are valid. 
+// 
+// A valid UnitVector3 is considered degenerate if a valid unit vector could
+// not be computed from the input vector from which the UnitVector3 
+// was constructed. This condition will happen if the input vector is
+// zero length, or if calculation of the unit vector overflows the 
+// available range of the specified floating point type.
+// 
 template <typename T>
 class UnitVector3 : public HubertBase
 {
@@ -310,6 +338,18 @@ class UnitVector3 : public HubertBase
 };
 
 
+//
+// Line3.
+//
+// Is considered valid as long as both Point3 input values used to 
+// define it are valid. 
+// 
+// A valid Line3 is considered degenerate if a valid unit vector could
+// not be computed from the input Vector3 from which the UnitVector3 
+// was constructed. This condition would happen if the input vcctor is
+// zero length, or if calculation of the unit vector overflowed the 
+// available range of the specified floating point type.
+// 
 template <typename T>
 class Line3 : public HubertBase
 {
@@ -336,7 +376,7 @@ class Line3 : public HubertBase
         {
             uint64_t newFlags = 0;
 
-            // non calulated data is preserved as is
+            // non calculated data is preserved as is
             _base = p1;
             _target = p2;
 
@@ -368,10 +408,15 @@ class Line3 : public HubertBase
                     _target = p2;
                     _fullDirection = Vector3<T>(p2.x() - p1.x(), p2.y() - p1.y(), p2.z() - p1.z());
                     _unitDirection = makeUnitVector3(_fullDirection);
-                }
 
-                // while the points are valid and not degenerate, it is still possible to end up
-                // with a degenerate vector if there is overflow, but we consider the line to be fine.
+                    if (isDegenerate(_fullDirection) || isDegenerate(_unitDirection))
+                    {
+                        // if the vector calculation overflows, call the line degenerate because
+                        // there is not much we can do with it since the points are too far apart
+                        // to use in any calculation
+                        newFlags |= cDegenerate;
+                    }
+                }
             }
 
             setValidityFlags(newFlags);
@@ -546,7 +591,7 @@ class Triangle3 : public HubertBase
     public:
         // constructors
         Triangle3() : Triangle3(Point3<T>(T(0.0), T(0.0), T(0.0)), Point3<T>(T(1.0), T(0.0), T(0.0)), Point3<T>(T(0.0), T(1.0), T(0.0))) {}
-        Triangle3(const Point3<T> & inP1, const Point3<T> & inP2, const Point3<T> & inP3) : _p1(inP1), _p2(inP2), _p3(inP3)  {}
+        Triangle3(const Point3<T>& inP1, const Point3<T>& inP2, const Point3<T>& inP3) { _validate(inP1, inP2, inP3); }
         Triangle3(const Triangle3 &) = default;
         ~Triangle3() = default;
 
@@ -559,6 +604,87 @@ class Triangle3 : public HubertBase
         inline const Point3<T>& p3() const { return _p3; }
 
     private:
+        void _validate(const Point3<T>& p1, const Point3<T>& p2, const Point3<T>& p3)
+        {
+            _p1 = p1;
+            _p2 = p2;
+            _p3 = p3;
+
+            uint64_t newFlags = 0;
+
+            // only do subnormal and degeneracy checks if valid
+            if (!(isValid(_p1) && isValid(_p2) && isValid(_p3)))
+            {
+                newFlags |= cInvalid;
+            }
+            else {
+                // if subnormal, we will do the calculations, but set the subnormal flag
+                // so that everyone knows that the calculations are reduced precision
+                if (isSubnormal(_p1) || isSubnormal(_p2) || isSubnormal(_p3))
+                {
+                    newFlags |= cSubnormalData;
+                }
+
+                // we do multiple degeneracy tests because we need to fail if any of them fail. If we did not
+                // other calculations down stream might fail because we reported a non-degenerate triangle. 
+                // Because of numerical  instability depending on the scale of the numbers, it is possible for 
+                // some approaches to differ in their response.
+
+                // first degeneracy test - collapsed edge or overflow edge. Overflow edges basically mean that
+                // even though the points are valid, the length of a side overflows what is representable in the
+                // floating point unit being used. Allowing that to be considered a non-degenerate triangle causes
+                // many downstream calculations to fail, thus prompting our decision to call it degenerate.
+                T dist1 = distance(_p1, _p2);
+                T dist2 = distance(_p2, _p3);
+                T dist3 = distance(_p3, _p1);
+                if (isEqual(dist1, T(0.0)) || !isValid(dist1) || isEqual(dist2, T(0.0)) || !isValid(dist2) || isEqual(dist3, T(0.0)) || !isValid(dist3))
+                {
+                    newFlags |= cDegenerate;
+                }
+
+                // 2nd degeneracy check - the area
+                if (!(newFlags & cDegenerate))
+                {
+                    if (isEqual(area(*this), T(0.0)))
+                    {
+                        newFlags |= cDegenerate;
+                    }
+                }
+
+                // 3rd degneracy check - cross product one way
+                if (!(newFlags & cDegenerate))
+                {
+                    Vector3<T> v = crossProduct(p2 - p1, p3 - p1);
+                    if (isEqual(v.x(), T(0.0)) && isEqual(v.y(), T(0.0)) && isEqual(v.z(), T(0.0)))
+                    {
+                        newFlags |= cDegenerate;
+                    }
+                }
+                // 3rd degneracy check - cross product second way
+                if (!(newFlags & cDegenerate))
+                {
+                    Vector3<T> v = crossProduct(p2 - p1, p3 - p2);
+                    if (isEqual(v.x(), T(0.0)) && isEqual(v.y(), T(0.0)) && isEqual(v.z(), T(0.0)))
+                    {
+                        newFlags |= cDegenerate;
+                    }
+                }
+
+                // 3rd degneracy check - cross product third way
+                if (!(newFlags & cDegenerate))
+                {
+                    Vector3<T> v = crossProduct(p3 - p1, p3 - p2);
+                    if (isEqual(v.x(), T(0.0)) && isEqual(v.y(), T(0.0)) && isEqual(v.z(), T(0.0)))
+                    {
+                        newFlags |= cDegenerate;
+                    }
+                }
+
+            }
+
+            setValidityFlags(newFlags);
+        }
+
         //private data
         Point3<T>   _p1;
         Point3<T>   _p2;
@@ -676,6 +802,24 @@ inline bool isValid(const UnitVector3<T> & v)
 
 template <typename T>
 inline bool isValid(const Line3<T> & v)
+{
+    return v.amValid();
+}
+
+template <typename T>
+inline bool isValid(const Plane<T>& v)
+{
+    return v.amValid();
+}
+
+template <typename T>
+inline bool isValid(const Ray3<T>& v)
+{
+    return v.amValid();
+}
+
+template <typename T>
+inline bool isValid(const Segment3<T>& v)
 {
     return v.amValid();
 }
