@@ -550,6 +550,18 @@ class Ray3 : public HubertBase
         UnitVector3<T>  _direction;
 };
 
+//
+// Segment3.
+//
+// Is considered valid as long as both Point3 input values used to 
+// define it are valid. 
+// 
+// A valid Segment3 is considered degenerate if a valid unit vector could
+// not be computed from the input Vector3 from which the UnitVector3 
+// was constructed. This condition would happen if the input vector is
+// zero length, or if calculation of the unit vector overflowed the 
+// available range of the specified floating point type.
+// 
 template <typename T>
 class Segment3 : public HubertBase
 {
@@ -603,6 +615,21 @@ class Segment3 : public HubertBase
         Point3<T>   _target;
 };
 
+//
+// Triangle3.
+//
+// Is considered valid as long as all 3 Point3 input values used to 
+// define it are valid. 
+// 
+// A valid Triangle3 is considered degenerate For a number of reasons:
+//    * Any of the 3 edges is collapsed to 0 length
+//    * Any of the 3 edges overflows when its length is computed
+//    * Are of the triangle is computed to be 0
+//    * Cross product of edge1 & edge2 creates a vector of 0 length
+//    * Cross product of edge1 & edge3 creates a vector of 0 length
+//    * Cross product of edge2 & edge3 creates a vector of 0 length
+// 
+// 
 template <typename T>
 class Triangle3 : public HubertBase
 {
