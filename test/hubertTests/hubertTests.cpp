@@ -1226,7 +1226,6 @@ TEMPLATE_TEST_CASE("Line3 specific degeneracy", "[Line3]", float, double)
 
 }
 
-
 ///////////////////////////////////////////////////////////////////////////
 // Plane construction tests 
 ///////////////////////////////////////////////////////////////////////////
@@ -1424,6 +1423,58 @@ TEMPLATE_TEST_CASE("Check Plane validity routines", "[Plane]", float, double)
                 }
             }
         }
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////
+// Plane specific degeneracy tests 
+///////////////////////////////////////////////////////////////////////////
+
+TEMPLATE_TEST_CASE("Plane specific degeneracy", "[Plane]", float, double)
+{
+    SECTION("Zero length up vector")
+    {
+        hubert::Point3<TestType> base(TestType(1.0), TestType(2.1), TestType(3.2));
+        hubert::UnitVector3<TestType> uv(0.0, 0.0, hubert::epsilon<TestType>());
+
+        hubert::Plane thePlane(base, uv);
+
+        CHECK(thePlane.amDegenerate());
+        CHECK(hubert::isDegenerate(thePlane));
+    }
+
+    SECTION("Just over zero length up vector")
+    {
+        hubert::Point3<TestType> base(TestType(1.0), TestType(2.1), TestType(3.2));
+        hubert::UnitVector3<TestType> uv(0.0, 0.0, hubert::epsilon<TestType>() * TestType(2.0));
+
+        hubert::Plane thePlane(base, uv);
+
+        CHECK_FALSE(thePlane.amDegenerate());
+        CHECK_FALSE(hubert::isDegenerate(thePlane));
+    }
+
+
+    SECTION("Very large up vector")
+    {
+        hubert::Point3<TestType> base(TestType(1.0), TestType(2.1), TestType(3.2));
+        hubert::UnitVector3<TestType> uv(std::numeric_limits<TestType>::max(), std::numeric_limits<TestType>::max(), std::numeric_limits<TestType>::max());
+
+        hubert::Plane thePlane(base, uv);
+
+        CHECK(thePlane.amDegenerate());
+        CHECK(hubert::isDegenerate(thePlane));
+    }
+
+    SECTION("Just under very large up vector")
+    {
+        hubert::Point3<TestType> base(TestType(1.0), TestType(2.1), TestType(3.2));
+        hubert::UnitVector3<TestType> uv(std::numeric_limits<TestType>::max() / TestType(2.0), std::numeric_limits<TestType>::max() / TestType(2.0), std::numeric_limits<TestType>::max() / TestType(2.0));
+
+        hubert::Plane thePlane(base, uv);
+
+        CHECK_FALSE(thePlane.amDegenerate());
+        CHECK_FALSE(hubert::isDegenerate(thePlane));
     }
 }
 

@@ -428,6 +428,15 @@ class Line3 : public HubertBase
         UnitVector3<T>  _unitDirection;
 };
 
+//
+// Plane.
+//
+// Is considered valid as long as the base Point3 input values and the
+// up UnitVector3 used to define it are valid
+// 
+// A valid Plane is considered degenerate if a non-degenerate up UnitVector3
+// is not provided.
+// 
 template <typename T>
 class Plane : public HubertBase
 {
