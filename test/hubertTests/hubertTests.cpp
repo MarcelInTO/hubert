@@ -1223,7 +1223,6 @@ TEMPLATE_TEST_CASE("Line3 specific degeneracy", "[Line3]", float, double)
         CHECK_FALSE(theLine.amDegenerate());
         CHECK_FALSE(hubert::isDegenerate(theLine));
     }
-
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1687,6 +1686,58 @@ TEMPLATE_TEST_CASE("Check Ray3 validity routines", "[Ray3]", float, double)
 }
 
 ///////////////////////////////////////////////////////////////////////////
+// Ray3 specific degeneracy tests 
+///////////////////////////////////////////////////////////////////////////
+
+TEMPLATE_TEST_CASE("Ray3 specific degeneracy", "[Ray3]", float, double)
+{
+    SECTION("Zero length up vector")
+    {
+        hubert::Point3<TestType> base(TestType(1.0), TestType(2.1), TestType(3.2));
+        hubert::UnitVector3<TestType> uv(0.0, 0.0, hubert::epsilon<TestType>());
+
+        hubert::Ray3 theRay3(base, uv);
+
+        CHECK(theRay3.amDegenerate());
+        CHECK(hubert::isDegenerate(theRay3));
+    }
+
+    SECTION("Just over zero length up vector")
+    {
+        hubert::Point3<TestType> base(TestType(1.0), TestType(2.1), TestType(3.2));
+        hubert::UnitVector3<TestType> uv(0.0, 0.0, hubert::epsilon<TestType>() * TestType(2.0));
+
+        hubert::Ray3 theRay3(base, uv);
+
+        CHECK_FALSE(theRay3.amDegenerate());
+        CHECK_FALSE(hubert::isDegenerate(theRay3));
+    }
+
+
+    SECTION("Very large up vector")
+    {
+        hubert::Point3<TestType> base(TestType(1.0), TestType(2.1), TestType(3.2));
+        hubert::UnitVector3<TestType> uv(std::numeric_limits<TestType>::max(), std::numeric_limits<TestType>::max(), std::numeric_limits<TestType>::max());
+
+        hubert::Ray3 theRay3(base, uv);
+
+        CHECK(theRay3.amDegenerate());
+        CHECK(hubert::isDegenerate(theRay3));
+    }
+
+    SECTION("Just under very large up vector")
+    {
+        hubert::Point3<TestType> base(TestType(1.0), TestType(2.1), TestType(3.2));
+        hubert::UnitVector3<TestType> uv(std::numeric_limits<TestType>::max() / TestType(2.0), std::numeric_limits<TestType>::max() / TestType(2.0), std::numeric_limits<TestType>::max() / TestType(2.0));
+
+        hubert::Ray3 theRay3(base, uv);
+
+        CHECK_FALSE(theRay3.amDegenerate());
+        CHECK_FALSE(hubert::isDegenerate(theRay3));
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////
 // Segment3 construction tests 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -1870,6 +1921,70 @@ TEMPLATE_TEST_CASE("Check Segment3 validity routines", "[Segment3]", float, doub
             }
         }
     }
+}
+
+///////////////////////////////////////////////////////////////////////////
+// Segment3 specific degeneracy tests 
+///////////////////////////////////////////////////////////////////////////
+
+TEMPLATE_TEST_CASE("Segment3 specific degeneracy", "[Segment3]", float, double)
+{
+    SECTION("Zero length")
+    {
+        hubert::Point3<TestType> p1(TestType(1.0), TestType(1.0), TestType(1.0));
+        hubert::Point3<TestType> p2(TestType(1.0), TestType(1.0), TestType(1.0));
+
+        hubert::Segment3<TestType> theSegment(p1, p2);
+
+        CHECK(theSegment.amDegenerate());
+        CHECK(hubert::isDegenerate(theSegment));
+    }
+
+    SECTION("Within epsilon of Zero length")
+    {
+        hubert::Point3<TestType> p1(TestType(1.0), TestType(1.0) + hubert::epsilon<TestType>(), TestType(1.0));
+        hubert::Point3<TestType> p2(TestType(1.0), TestType(1.0), TestType(1.0));
+
+        hubert::Segment3<TestType> theSegment(p1, p2);
+
+        CHECK(theSegment.amDegenerate());
+        CHECK(hubert::isDegenerate(theSegment));
+    }
+
+    SECTION("Just over zero length")
+    {
+        hubert::Point3<TestType> p1(TestType(1.0), TestType(1.0) + hubert::epsilon<TestType>() * TestType(2.0), TestType(1.0));
+        hubert::Point3<TestType> p2(TestType(1.0) + hubert::epsilon<TestType>() * TestType(2.0), TestType(1.0), TestType(1.0));
+
+        hubert::Segment3<TestType> theSegment(p1, p2);
+
+        CHECK_FALSE(theSegment.amDegenerate());
+        CHECK_FALSE(hubert::isDegenerate(theSegment));
+    }
+
+
+    SECTION("Very large - sure to overflow")
+    {
+        hubert::Point3<TestType> p1(std::numeric_limits<TestType>::max(), std::numeric_limits<TestType>::max(), std::numeric_limits<TestType>::max());
+        hubert::Point3<TestType> p2(-std::numeric_limits<TestType>::max(), -std::numeric_limits<TestType>::max(), -std::numeric_limits<TestType>::max());
+
+        hubert::Segment3<TestType> theSegment(p1, p2);
+
+        CHECK(theSegment.amDegenerate());
+        CHECK(hubert::isDegenerate(theSegment));
+    }
+
+    SECTION("Just under very large - should not overflow")
+    {
+        hubert::Point3<TestType> p1(std::numeric_limits<TestType>::max() / TestType(4.0), std::numeric_limits<TestType>::max() / TestType(4.0), std::numeric_limits<TestType>::max() / TestType(4.0));
+        hubert::Point3<TestType> p2(-std::numeric_limits<TestType>::max() / TestType(4.0), -std::numeric_limits<TestType>::max() / TestType(4.0), -std::numeric_limits<TestType>::max() / TestType(4.0));
+
+        hubert::Segment3<TestType> theSegment(p1, p2);
+
+        CHECK_FALSE(theSegment.amDegenerate());
+        CHECK_FALSE(hubert::isDegenerate(theSegment));
+    }
+
 }
 
 ///////////////////////////////////////////////////////////////////////////

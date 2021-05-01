@@ -490,6 +490,15 @@ class Plane : public HubertBase
         UnitVector3<T>  _up;
 };
 
+//
+// Ray3.
+//
+// Is considered valid as long as the base Point3 input values and the
+// direction UnitVector3 used to define it are valid
+// 
+// A valid Ray3 is considered degenerate if a non-degenerate direction UnitVector3
+// is not provided.
+// 
 template <typename T>
 class Ray3 : public HubertBase
 {
