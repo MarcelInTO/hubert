@@ -2225,3 +2225,166 @@ TEMPLATE_TEST_CASE("Check Triangle3 validity routines", "[Triangle3]", float, do
     }
 }
 
+///////////////////////////////////////////////////////////////////////////
+// Creation functions - (alternates to provided constructor) 
+///////////////////////////////////////////////////////////////////////////
+
+TEMPLATE_TEST_CASE("makeVector3(Point3, Point3)", "[make]", float, double)
+{
+    hubert::Point3<TestType> p1(TestType(1.0), TestType(2.0), TestType(3.0));
+    hubert::Point3<TestType> p2(TestType(3.5), TestType(5.5), TestType(7.5));
+
+    hubert::Vector3<TestType> madeVector = hubert::makeVector3(p1, p2);
+
+    CHECK(madeVector.x() == TestType(2.5));
+    CHECK(madeVector.y() == TestType(3.5));
+    CHECK(madeVector.z() == TestType(4.5));
+}
+
+TEMPLATE_TEST_CASE("makeVector3(UnitVector3)", "[make]", float, double)
+{
+    hubert::Vector3<TestType> v1(TestType(1.0), TestType(2.0), TestType(3.0));
+    hubert::UnitVector3<TestType> uv1(v1.x(), v1.y(), v1.z());
+
+    hubert::Vector3<TestType> madeVector = hubert::makeVector3(uv1);
+
+    CHECK(hubert::isEqual(madeVector.x(), v1.x() / hubert::magnitude(v1)));
+    CHECK(hubert::isEqual(madeVector.y(), v1.y() / hubert::magnitude(v1)));
+    CHECK(hubert::isEqual(madeVector.z(), v1.z() / hubert::magnitude(v1)));
+}
+
+TEMPLATE_TEST_CASE("makeUnitVector3(Vector3)", "[make]", float, double)
+{
+    hubert::Vector3<TestType> v1(TestType(1.0), TestType(2.0), TestType(3.0));
+
+    hubert::UnitVector3<TestType> madeVector = hubert::makeUnitVector3(v1);
+
+    CHECK(hubert::isEqual(madeVector.x(), v1.x() / hubert::magnitude(v1)));
+    CHECK(hubert::isEqual(madeVector.y(), v1.y() / hubert::magnitude(v1)));
+    CHECK(hubert::isEqual(madeVector.z(), v1.z() / hubert::magnitude(v1)));
+}
+
+TEMPLATE_TEST_CASE("makeUnitVector3(Point3, Point3)", "[make]", float, double)
+{
+    hubert::Point3<TestType> p1(TestType(1.0), TestType(2.0), TestType(3.0));
+    hubert::Point3<TestType> p2(TestType(3.5), TestType(5.5), TestType(7.5));
+
+    hubert::Vector3<TestType> v1 = p2 - p1;
+
+    hubert::UnitVector3<TestType> madeVector = hubert::makeUnitVector3(p1, p2);
+
+    CHECK(hubert::isEqual(madeVector.x(), v1.x() / hubert::magnitude(v1)));
+    CHECK(hubert::isEqual(madeVector.y(), v1.y() / hubert::magnitude(v1)));
+    CHECK(hubert::isEqual(madeVector.z(), v1.z() / hubert::magnitude(v1)));
+}
+
+TEMPLATE_TEST_CASE("makeLine3(Point3, Vector3)", "[make]", float, double)
+{
+    hubert::Point3<TestType> p1(TestType(1.0), TestType(2.0), TestType(3.0));
+    hubert::Vector3<TestType> v1(TestType(1.0), TestType(1.0), TestType(1.0));
+
+    hubert::Line3<TestType> theLine = hubert::makeLine3(p1, v1);
+
+    CHECK(hubert::isEqual(theLine.base().x(), p1.x()));
+    CHECK(hubert::isEqual(theLine.base().y(), p1.y()));
+    CHECK(hubert::isEqual(theLine.base().z(), p1.z()));
+    CHECK(hubert::isEqual(theLine.target().x(), p1.x() + v1.x()));
+    CHECK(hubert::isEqual(theLine.target().y(), p1.y() + v1.y()));
+    CHECK(hubert::isEqual(theLine.target().z(), p1.z() + v1.z()));
+}
+
+TEMPLATE_TEST_CASE("makeLine3(Point3, UnitVector3)", "[make]", float, double)
+{
+    hubert::Point3<TestType> p1(TestType(1.0), TestType(2.0), TestType(3.0));
+    hubert::Vector3<TestType> v1(TestType(1.0), TestType(1.0), TestType(1.0));
+    hubert::UnitVector3<TestType> uv1 = hubert::makeUnitVector3(v1);
+
+    hubert::Line3<TestType> theLine = hubert::makeLine3(p1, uv1);
+
+    CHECK(hubert::isEqual(theLine.base().x(), p1.x()));
+    CHECK(hubert::isEqual(theLine.base().y(), p1.y()));
+    CHECK(hubert::isEqual(theLine.base().z(), p1.z()));
+    CHECK(hubert::isEqual(theLine.target().x(), p1.x() + uv1.x()));
+    CHECK(hubert::isEqual(theLine.target().y(), p1.y() + uv1.y()));
+    CHECK(hubert::isEqual(theLine.target().z(), p1.z() + uv1.z()));
+}
+
+TEMPLATE_TEST_CASE("makePlane(Point3, Point3, Point3)", "[make]", float, double)
+{
+    SECTION("xy plane up")
+    {
+        hubert::Point3<TestType> p1(TestType(-1.0), TestType(-1.0), TestType(3.0));
+        hubert::Point3<TestType> p2(TestType(1.0), TestType(-1.0), TestType(3.0));
+        hubert::Point3<TestType> p3(TestType(0.0), TestType(1.0), TestType(3.0));
+
+        hubert::Plane<TestType> thePlane = hubert::makePlane(p1, p2, p3);
+
+        CHECK(hubert::isEqual(thePlane.base().x(), p1.x()));
+        CHECK(hubert::isEqual(thePlane.base().y(), p1.y()));
+        CHECK(hubert::isEqual(thePlane.base().z(), p1.z()));
+        CHECK(hubert::isEqual(thePlane.up().x(), TestType(0.0)));
+        CHECK(hubert::isEqual(thePlane.up().y(), TestType(0.0)));
+        CHECK(hubert::isEqual(thePlane.up().z(), TestType(1.0)));
+    }
+    SECTION("xy plane down")
+    {
+        hubert::Point3<TestType> p1(TestType(-1.0), TestType(-1.0), TestType(3.0));
+        hubert::Point3<TestType> p2(TestType(0.0), TestType(1.0), TestType(3.0));
+        hubert::Point3<TestType> p3(TestType(1.0), TestType(-1.0), TestType(3.0));
+
+        hubert::Plane<TestType> thePlane = hubert::makePlane(p1, p2, p3);
+
+        CHECK(hubert::isEqual(thePlane.base().x(), p1.x()));
+        CHECK(hubert::isEqual(thePlane.base().y(), p1.y()));
+        CHECK(hubert::isEqual(thePlane.base().z(), p1.z()));
+        CHECK(hubert::isEqual(thePlane.up().x(), TestType(0.0)));
+        CHECK(hubert::isEqual(thePlane.up().y(), TestType(0.0)));
+        CHECK(hubert::isEqual(thePlane.up().z(), TestType(-1.0)));
+    }
+    SECTION("xz plane front")
+    {
+        hubert::Point3<TestType> p1(TestType(-1.0), TestType(3.0), TestType(-1.0));
+        hubert::Point3<TestType> p2(TestType(1.0), TestType(3.0), TestType(-1.0));
+        hubert::Point3<TestType> p3(TestType(0.0), TestType(3.0), TestType(1.0));
+
+        hubert::Plane<TestType> thePlane = hubert::makePlane(p1, p2, p3);
+
+        CHECK(hubert::isEqual(thePlane.base().x(), p1.x()));
+        CHECK(hubert::isEqual(thePlane.base().y(), p1.y()));
+        CHECK(hubert::isEqual(thePlane.base().z(), p1.z()));
+        CHECK(hubert::isEqual(thePlane.up().x(), TestType(0.0)));
+        CHECK(hubert::isEqual(thePlane.up().y(), TestType(-1.0)));
+        CHECK(hubert::isEqual(thePlane.up().z(), TestType(0.0)));
+    }
+    SECTION("xz plane back")
+    {
+        hubert::Point3<TestType> p1(TestType(-1.0), TestType(3.0), TestType(-1.0));
+        hubert::Point3<TestType> p2(TestType(0.0), TestType(3.0), TestType(1.0));
+        hubert::Point3<TestType> p3(TestType(1.0), TestType(3.0), TestType(-1.0));
+
+        hubert::Plane<TestType> thePlane = hubert::makePlane(p1, p2, p3);
+
+        CHECK(hubert::isEqual(thePlane.base().x(), p1.x()));
+        CHECK(hubert::isEqual(thePlane.base().y(), p1.y()));
+        CHECK(hubert::isEqual(thePlane.base().z(), p1.z()));
+        CHECK(hubert::isEqual(thePlane.up().x(), TestType(0.0)));
+        CHECK(hubert::isEqual(thePlane.up().y(), TestType(1.0)));
+        CHECK(hubert::isEqual(thePlane.up().z(), TestType(0.0)));
+    }
+}
+
+TEMPLATE_TEST_CASE("makeRay3(Point3, Point3)", "[make]", float, double)
+{
+    hubert::Point3<TestType> p1(TestType(-1.0), TestType(3.0), TestType(-1.0));
+    hubert::Point3<TestType> p2(TestType(0.0), TestType(3.0), TestType(1.0));
+    hubert::Vector3<TestType> v1 = p2 - p1;
+
+    hubert::Ray3<TestType> madeRay = hubert::makeRay3(p1, p2);
+
+    CHECK(hubert::isEqual(madeRay.base().x(), p1.x()));
+    CHECK(hubert::isEqual(madeRay.base().y(), p1.y()));
+    CHECK(hubert::isEqual(madeRay.base().z(), p1.z()));
+    CHECK(hubert::isEqual(madeRay.unitDirection().x(), v1.x() / hubert::magnitude(v1)));
+    CHECK(hubert::isEqual(madeRay.unitDirection().y(), v1.y() / hubert::magnitude(v1)));
+    CHECK(hubert::isEqual(madeRay.unitDirection().z(), v1.z() / hubert::magnitude(v1)));
+}

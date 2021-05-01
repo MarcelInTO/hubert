@@ -298,6 +298,7 @@ class UnitVector3 : public HubertBase
            if (!(isValid(_x) && isValid(_y) && isValid(_z)))
             {
                 newFlags |= cInvalid;
+                _mag = infinity<T>();
             }
 
             // only do normalization and degeneracy checks if valid
@@ -308,17 +309,17 @@ class UnitVector3 : public HubertBase
                     newFlags |= cSubnormalData;
                 }
 
-                T mag = std::hypot(_x, _y, _z);
+                _mag = std::hypot(_x, _y, _z);
            
-                if (!isValid(mag) || isEqual(mag, T(0.0)))
+                if (!isValid(_mag) || isEqual(_mag, T(0.0)))
                 {
                     newFlags |= cDegenerate;
                 }
                 else
                 {
-                    _x /= mag;
-                    _y /= mag;
-                    _z /= mag;
+                    _x /= _mag;
+                    _y /= _mag;
+                    _z /= _mag;
 
                     // becasue we have modified the numbers, check them for subnormality again
                     if (isSubnormal(_x) || isSubnormal(_y) || isSubnormal(_z))
@@ -335,6 +336,7 @@ class UnitVector3 : public HubertBase
         T   _x;
         T   _y;
         T   _z;
+        T   _mag;
 };
 
 
@@ -802,7 +804,7 @@ inline Line3<T> makeLine3(const Point3<T> & p, const Vector3<T> v)
 template <typename T>
 inline Line3<T> makeLine3(const Point3<T> & p, const UnitVector3<T> v)
 {
-    return Line3<T>(p, p + v);
+    return Line3<T>(p, p + makeVector3(v));
 }
 
 
@@ -1108,6 +1110,17 @@ inline T magnitude(const Vector3<T>& v)
 template <typename T>
 inline T magnitude(const UnitVector3<T>& v)
 {
+    if (v.amDegenerate())
+    {
+        if (v.amValid())
+        {
+            return T(0.0);
+        }
+        else
+        {
+            return infinity<T>();
+        }
+    }
     return T(1.0);
 }
 
