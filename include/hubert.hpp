@@ -965,6 +965,30 @@ inline bool isSubnormal(const Line3<T> & v)
     return v.amSubnormal();
 }
 
+template <typename T>
+inline bool isSubnormal(const Plane<T>& v)
+{
+    return v.amSubnormal();
+}
+
+template <typename T>
+inline bool isSubnormal(const Ray3<T>& v)
+{
+    return v.amSubnormal();
+}
+
+template <typename T>
+inline bool isSubnormal(const Segment3<T>& v)
+{
+    return v.amSubnormal();
+}
+
+template <typename T>
+inline bool isSubnormal(const Triangle3<T>& v)
+{
+    return v.amSubnormal();
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 // Vector Math

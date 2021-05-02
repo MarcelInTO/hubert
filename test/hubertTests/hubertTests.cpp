@@ -553,13 +553,17 @@ TEMPLATE_TEST_CASE("Check Point3 validity routines", "[Point3]", float, double)
                 {
                     hubert::Point3<TestType> p1{ x, y, z };
 
-                    CHECK(p1.amValid() == true);
-                    CHECK(p1.amDegenerate() == false);
+                    CHECK(p1.amValid());
+                    CHECK(hubert::isValid(p1));
+
+                    CHECK_FALSE(p1.amDegenerate());
+                    CHECK_FALSE(hubert::isDegenerate(p1));
 
                     // we have already run the isValid test - so assuming it works, 
                     // this does too
                     bool tv = hubert::isSubnormal(x) || hubert::isSubnormal(y) || hubert::isSubnormal(z);
                     CHECK(p1.amSubnormal() == tv);
+                    CHECK(hubert::isSubnormal(p1) == tv);
                 }
             }
         }
@@ -575,9 +579,14 @@ TEMPLATE_TEST_CASE("Check Point3 validity routines", "[Point3]", float, double)
                 {
                     hubert::Point3<TestType> p1{ x, y, z };
 
-                    CHECK(p1.amValid() == false);
-                    CHECK(p1.amDegenerate() == true);
-                    CHECK(p1.amSubnormal() == false);
+                    CHECK_FALSE(p1.amValid());
+                    CHECK_FALSE(hubert::isValid(p1));
+
+                    CHECK(p1.amDegenerate());
+                    CHECK(hubert::isDegenerate(p1));
+
+                    CHECK_FALSE(p1.amSubnormal());
+                    CHECK_FALSE(hubert::isSubnormal(p1));
                 }
             }
         }
@@ -602,7 +611,10 @@ TEMPLATE_TEST_CASE("Construct Vector3 with default parameters", "[Vector3]", flo
     CHECK(p1.y() == TestType(0.0));
     CHECK(p1.z() == TestType(0.0));
 
+    CHECK(p1.amValid());
     CHECK(isValid(p1));
+
+    CHECK_FALSE(p1.amDegenerate());
     CHECK_FALSE(isDegenerate(p1));
 }
 
@@ -614,7 +626,10 @@ TEMPLATE_TEST_CASE("Construct Vector3 with constant parameters", "[Vector3]", fl
     CHECK(p1.y() == TestType(2.1));
     CHECK(p1.z() == TestType(3.1));
 
+    CHECK(p1.amValid());
     CHECK(isValid(p1));
+
+    CHECK_FALSE(p1.amDegenerate());
     CHECK_FALSE(isDegenerate(p1));
 }
 
@@ -628,7 +643,10 @@ TEMPLATE_TEST_CASE("Construct Vector3 with copy  constructor", "[Vector3]", floa
     CHECK(p2.y() == TestType(2.1));
     CHECK(p2.z() == TestType(3.1));
 
+    CHECK(p2.amValid());
     CHECK(isValid(p2));
+
+    CHECK_FALSE(p2.amDegenerate());
     CHECK_FALSE(isDegenerate(p2));
 }
 
@@ -641,7 +659,10 @@ TEMPLATE_TEST_CASE("Construct Vector3 with assignment", "[Vector3]", float, doub
     CHECK(p2.y() == TestType(2.1));
     CHECK(p2.z() == TestType(3.1));
 
+    CHECK(p2.amValid());
     CHECK(isValid(p2));
+
+    CHECK_FALSE(p2.amDegenerate());
     CHECK_FALSE(isDegenerate(p2));
 }
 
@@ -653,7 +674,10 @@ TEMPLATE_TEST_CASE("Construct Vector3 with initializer", "[Vector3]", float, dou
     CHECK(p2.y() == TestType(2.1));
     CHECK(p2.z() == TestType(3.1));
 
+    CHECK(p2.amValid());
     CHECK(isValid(p2));
+
+    CHECK_FALSE(p2.amDegenerate());
     CHECK_FALSE(isDegenerate(p2));
 }
 
@@ -673,13 +697,17 @@ TEMPLATE_TEST_CASE("Check Vector3 validity routines", "[Vector3]", float, double
                 {
                     hubert::Vector3<TestType> p1{ x, y, z };
 
-                    CHECK(p1.amValid() == true);
-                    CHECK(p1.amDegenerate() == false);
+                    CHECK(p1.amValid());
+                    CHECK(isValid(p1));
+
+                    CHECK_FALSE(p1.amDegenerate());
+                    CHECK_FALSE(isDegenerate(p1));
 
                     // we have already run the isValid test - so assuming it works, 
                     // this does too
                     bool tv = hubert::isSubnormal(x) || hubert::isSubnormal(y) || hubert::isSubnormal(z);
                     CHECK(p1.amSubnormal() == tv);
+                    CHECK(isSubnormal(p1) == tv);
                 }
             }
         }
@@ -695,9 +723,14 @@ TEMPLATE_TEST_CASE("Check Vector3 validity routines", "[Vector3]", float, double
                 {
                     hubert::Vector3<TestType> p1{ x, y, z };
 
-                    CHECK(p1.amValid() == false);
-                    CHECK(p1.amDegenerate() == true);
-                    CHECK(p1.amSubnormal() == false);
+                    CHECK_FALSE(p1.amValid());
+                    CHECK_FALSE(isValid(p1));
+
+                    CHECK(p1.amDegenerate());
+                    CHECK(isDegenerate(p1));
+
+                    CHECK_FALSE(p1.amSubnormal());
+                    CHECK_FALSE(isSubnormal(p1));
                 }
             }
         }
@@ -838,21 +871,32 @@ TEMPLATE_TEST_CASE("Check UnitVector3 validity routines", "[UnitVector3]", float
 
                     if (hubert::isEqual(len, TestType(0.0)))
                     {
-                        CHECK(p1.amValid() == true);
-                        CHECK(p1.amDegenerate() == true);
+                        CHECK(p1.amValid());
+                        CHECK(isValid(p1));
+
+                        CHECK(p1.amDegenerate());
+                        CHECK(isDegenerate(p1));
 
                     }
                     else if (len == hubert::infinity<TestType>())
                     {
-                        CHECK(p1.amValid() == true);
-                        CHECK(p1.amDegenerate() == true);
+                        CHECK(p1.amValid());
+                        CHECK(isValid(p1));
+
+                        CHECK(p1.amDegenerate());
+                        CHECK(isDegenerate(p1));
                     }
                     else
                     {
                         TestType nlen = std::hypot(p1.x(), p1.y(), + p1.z());
+
                         CHECK(hubert::isEqual(nlen, TestType(1.0)));
-                        CHECK(p1.amValid() == true);
-                        CHECK(p1.amDegenerate() == false);
+
+                        CHECK(p1.amValid());
+                        CHECK(isValid(p1));
+
+                        CHECK_FALSE(p1.amDegenerate());
+                        CHECK_FALSE(isDegenerate(p1));
                     }
 
                     // we have already run the isValid test - so assuming it works, 
@@ -860,6 +904,7 @@ TEMPLATE_TEST_CASE("Check UnitVector3 validity routines", "[UnitVector3]", float
                     bool tv = hubert::isSubnormal(x) || hubert::isSubnormal(y) || hubert::isSubnormal(z);
                     bool tv2 = hubert::isSubnormal(x/len) || hubert::isSubnormal(y/len) || hubert::isSubnormal(z/len);
                     CHECK(p1.amSubnormal() == (tv || tv2));
+                    CHECK(isSubnormal(p1) == (tv || tv2));
                 }
             }
         }
@@ -875,9 +920,14 @@ TEMPLATE_TEST_CASE("Check UnitVector3 validity routines", "[UnitVector3]", float
                 {
                     hubert::UnitVector3<TestType> p1{ x, y, z };
 
-                    CHECK(p1.amValid() == false);
-                    CHECK(p1.amDegenerate() == true);
+                    CHECK_FALSE(p1.amValid());
+                    CHECK_FALSE(isValid(p1));
+
+                    CHECK(p1.amDegenerate());
+                    CHECK(isDegenerate(p1));
+
                     CHECK(p1.amSubnormal() == false);
+                    CHECK_FALSE(isSubnormal(p1));
                 }
             }
         }
@@ -893,6 +943,7 @@ TEMPLATE_TEST_CASE("UnitVector3 specific degeneracy", "[Line3]", float, double)
     SECTION("Zero length")
     {
         hubert::UnitVector3<TestType> uv(0.0, 0.0, hubert::epsilon<TestType>());
+
         CHECK(uv.amDegenerate());
         CHECK(hubert::isDegenerate(uv));
     }
@@ -941,7 +992,10 @@ TEMPLATE_TEST_CASE("Construct Line3 with default parameters", "[Line3]", float, 
     CHECK(hubert::isEqual(theLine.unitDirection().y(), TestType(1.0) / TestType(std::sqrt(TestType(3.0)))));
     CHECK(hubert::isEqual(theLine.unitDirection().z(), TestType(1.0) / TestType(std::sqrt(TestType(3.0)))));
 
+    CHECK(theLine.amValid());
     CHECK(isValid(theLine));
+
+    CHECK_FALSE(theLine.amDegenerate());
     CHECK_FALSE(isDegenerate(theLine));
 }
 
@@ -968,7 +1022,10 @@ TEMPLATE_TEST_CASE("Construct Line3 with constant parameters", "[Line3]", float,
     CHECK(hubert::isEqual(theLine.unitDirection().y(), theLine.fullDirection().y() / dist));
     CHECK(hubert::isEqual(theLine.unitDirection().z(), theLine.fullDirection().z() / dist));
 
+    CHECK(theLine.amValid());
     CHECK(isValid(theLine));
+
+    CHECK_FALSE(theLine.amDegenerate());
     CHECK_FALSE(isDegenerate(theLine));
 }
 
@@ -996,7 +1053,10 @@ TEMPLATE_TEST_CASE("Construct Line3 with copy  constructor", "[Line3]", float, d
     CHECK(hubert::isEqual(theLine.unitDirection().y(), theLine.fullDirection().y() / dist));
     CHECK(hubert::isEqual(theLine.unitDirection().z(), theLine.fullDirection().z() / dist));
 
+    CHECK(theLine.amValid());
     CHECK(isValid(theLine));
+
+    CHECK_FALSE(theLine.amDegenerate());
     CHECK_FALSE(isDegenerate(theLine));
 }
 
@@ -1024,7 +1084,10 @@ TEMPLATE_TEST_CASE("Construct Line3 with assignment", "[Line3]", float, double)
     CHECK(hubert::isEqual(theLine.unitDirection().y(), theLine.fullDirection().y() / dist));
     CHECK(hubert::isEqual(theLine.unitDirection().z(), theLine.fullDirection().z() / dist));
 
+    CHECK(theLine.amValid());
     CHECK(isValid(theLine));
+
+    CHECK_FALSE(theLine.amDegenerate());
     CHECK_FALSE(isDegenerate(theLine));
 }
 
@@ -1051,7 +1114,10 @@ TEMPLATE_TEST_CASE("Construct Line3 with initializer", "[Line3]", float, double)
     CHECK(hubert::isEqual(theLine.unitDirection().y(), theLine.fullDirection().y() / dist));
     CHECK(hubert::isEqual(theLine.unitDirection().z(), theLine.fullDirection().z() / dist));
 
+    CHECK(theLine.amValid());
     CHECK(isValid(theLine));
+
+    CHECK_FALSE(theLine.amDegenerate());
     CHECK_FALSE(isDegenerate(theLine));
 }
 
@@ -1087,19 +1153,25 @@ TEMPLATE_TEST_CASE("Check Line3 validity routines", "[Line3]", float, double)
                     CHECK(theLine.target().z() == p2.z());
 
                     CHECK(theLine.amValid() == true);
+                    CHECK(isValid(theLine));
+
+
                     if (hubert::isEqual(hubert::distance(p1, p2), TestType(0.0)))
                     {
                         CHECK(theLine.amDegenerate() == true);
+                        CHECK(isDegenerate(theLine));
                     }
                     else
                     {
                         if (hubert::isValid(hubert::distance(p1, p2)))
                         {
                             CHECK_FALSE(theLine.amDegenerate());
+                            CHECK_FALSE(isDegenerate(theLine));
                         }
                         else
                         {
                             CHECK(theLine.amDegenerate());
+                            CHECK(isDegenerate(theLine));
                         }
                     }
 
@@ -1107,6 +1179,7 @@ TEMPLATE_TEST_CASE("Check Line3 validity routines", "[Line3]", float, double)
                     // this does too
                     bool tv = hubert::isSubnormal(p1) || hubert::isSubnormal(p2);
                     CHECK(theLine.amSubnormal() == tv);
+                    CHECK(isSubnormal(theLine) == tv);
 
                     // if we are returning a degenerate line, it must return invalid
                     // directions
@@ -1147,9 +1220,14 @@ TEMPLATE_TEST_CASE("Check Line3 validity routines", "[Line3]", float, double)
                                 CHECK(((std::isnan(theLine.target().y()) && std::isnan(p2.y())) || (theLine.target().y() == p2.y())));
                                 CHECK(((std::isnan(theLine.target().z()) && std::isnan(p2.z())) || (theLine.target().z() == p2.z())));
 
-                                CHECK(theLine.amValid() == false);
-                                CHECK(theLine.amDegenerate() == true);
-                                CHECK(theLine.amSubnormal() == false);
+                                CHECK_FALSE(theLine.amValid());
+                                CHECK_FALSE(isValid(theLine));
+
+                                CHECK(theLine.amDegenerate());
+                                CHECK(isDegenerate(theLine));
+
+                                CHECK_FALSE(theLine.amSubnormal());
+                                CHECK_FALSE(isSubnormal(theLine));
 
                                 CHECK_FALSE(hubert::isValid(theLine.unitDirection()));
                                 CHECK_FALSE(hubert::isValid(theLine.fullDirection()));
@@ -1240,7 +1318,10 @@ TEMPLATE_TEST_CASE("Construct Plane with default parameters", "[Plane]", float, 
     CHECK(thePlane.up().y() == TestType(0.0));
     CHECK(thePlane.up().z() == TestType(1.0));
 
+    CHECK(thePlane.amValid());
     CHECK(isValid(thePlane));
+
+    CHECK_FALSE(thePlane.amDegenerate());
     CHECK_FALSE(isDegenerate(thePlane));
 }
 
@@ -1261,7 +1342,10 @@ TEMPLATE_TEST_CASE("Construct Plane with constant parameters", "[Plane]", float,
     CHECK(hubert::isEqual(thePlane.up().y(), v1.y() / v1.magnitude()));
     CHECK(hubert::isEqual(thePlane.up().z(), v1.z() / v1.magnitude()));
 
+    CHECK(thePlane.amValid());
     CHECK(isValid(thePlane));
+
+    CHECK_FALSE(thePlane.amDegenerate());
     CHECK_FALSE(isDegenerate(thePlane));
 }
 
@@ -1283,7 +1367,10 @@ TEMPLATE_TEST_CASE("Construct Plane with copy  constructor", "[Plane]", float, d
     CHECK(hubert::isEqual(thePlane.up().y(), v1.y() / v1.magnitude()));
     CHECK(hubert::isEqual(thePlane.up().z(), v1.z() / v1.magnitude()));
 
+    CHECK(thePlane.amValid());
     CHECK(isValid(thePlane));
+
+    CHECK_FALSE(thePlane.amDegenerate());
     CHECK_FALSE(isDegenerate(thePlane));
 }
 
@@ -1305,7 +1392,10 @@ TEMPLATE_TEST_CASE("Construct Plane with assignment", "[Plane]", float, double)
     CHECK(hubert::isEqual(thePlane.up().y(), v1.y() / v1.magnitude()));
     CHECK(hubert::isEqual(thePlane.up().z(), v1.z() / v1.magnitude()));
 
+    CHECK(thePlane.amValid());
     CHECK(isValid(thePlane));
+
+    CHECK_FALSE(thePlane.amDegenerate());
     CHECK_FALSE(isDegenerate(thePlane));
 }
 
@@ -1326,7 +1416,10 @@ TEMPLATE_TEST_CASE("Construct Plane with initializer", "[Plane]", float, double)
     CHECK(hubert::isEqual(thePlane.up().y(), v1.y() / v1.magnitude()));
     CHECK(hubert::isEqual(thePlane.up().z(), v1.z() / v1.magnitude()));
 
+    CHECK(thePlane.amValid());
     CHECK(isValid(thePlane));
+
+    CHECK_FALSE(thePlane.amDegenerate());
     CHECK_FALSE(isDegenerate(thePlane));
 }
 
@@ -1366,22 +1459,26 @@ TEMPLATE_TEST_CASE("Check Plane validity routines", "[Plane]", float, double)
                     // we know the plane is valid (as opposed to degenerate) because it was
                     // directly constructed out of numbers known to be valid
                     CHECK(thePlane.amValid());
+                    CHECK(isValid(thePlane));
 
                     // if the numbers are valid, then the plane can only be degenerate if 
                     // the normal is degenerate
                     if (v1.amDegenerate())
                     {
                         CHECK(thePlane.amDegenerate());
+                        CHECK(isDegenerate(thePlane));
                     }
                     else
                     {
                         CHECK_FALSE(thePlane.amDegenerate());
+                        CHECK_FALSE(isDegenerate(thePlane));
                     }
 
                     // we have already run the isValid test - so assuming it works, 
                     // this does too
                     bool tv = hubert::isSubnormal(p1) || hubert::isSubnormal(v1);
                     CHECK(thePlane.amSubnormal() == tv);
+                    CHECK(isSubnormal(thePlane) == tv);
                 }
             }
         }
@@ -1407,14 +1504,25 @@ TEMPLATE_TEST_CASE("Check Plane validity routines", "[Plane]", float, double)
                                 hubert::Plane<TestType> thePlane(p1, v1);
 
                                 CHECK_FALSE(p1.amValid());
+                                CHECK_FALSE(isValid(p1));
+
                                 CHECK(p1.amDegenerate());
+                                CHECK(isDegenerate(p1));
 
                                 CHECK_FALSE(v1.amValid());
+                                CHECK_FALSE(isValid(v1));
+
                                 CHECK(v1.amDegenerate());
+                                CHECK(isDegenerate(v1));
 
                                 CHECK_FALSE(thePlane.amValid());
+                                CHECK_FALSE(isValid(thePlane));
+
                                 CHECK(thePlane.amDegenerate());
+                                CHECK(isDegenerate(thePlane));
+
                                 CHECK_FALSE(thePlane.amSubnormal());
+                                CHECK_FALSE(isSubnormal(thePlane));
 
                             }
                         }
@@ -1492,7 +1600,10 @@ TEMPLATE_TEST_CASE("Construct Ray3 with default parameters", "[Ray3]", float, do
     CHECK(theRay.unitDirection().y() == TestType(0.0));
     CHECK(theRay.unitDirection().z() == TestType(1.0));
 
+    CHECK(theRay.amValid());
     CHECK(isValid(theRay));
+
+    CHECK_FALSE(theRay.amDegenerate());
     CHECK_FALSE(isDegenerate(theRay));
 }
 
@@ -1516,7 +1627,10 @@ TEMPLATE_TEST_CASE("Construct Ray3 with constant parameters", "[Ray3]", float, d
     CHECK(hubert::isEqual(theRay.unitDirection().y(), v1.y() / dist));
     CHECK(hubert::isEqual(theRay.unitDirection().z(), v1.z() / dist));
 
+    CHECK(theRay.amValid());
     CHECK(isValid(theRay));
+
+    CHECK_FALSE(theRay.amDegenerate());
     CHECK_FALSE(isDegenerate(theRay));
 }
 
@@ -1541,7 +1655,10 @@ TEMPLATE_TEST_CASE("Construct Ray3 with copy  constructor", "[Ray3]", float, dou
     CHECK(hubert::isEqual(theRay.unitDirection().y(), v1.y() / dist));
     CHECK(hubert::isEqual(theRay.unitDirection().z(), v1.z() / dist));
 
+    CHECK(theRay.amValid());
     CHECK(isValid(theRay));
+
+    CHECK_FALSE(theRay.amDegenerate());
     CHECK_FALSE(isDegenerate(theRay));
 }
 
@@ -1566,7 +1683,10 @@ TEMPLATE_TEST_CASE("Construct Ray3 with assignment", "[Ray3]", float, double)
     CHECK(hubert::isEqual(theRay.unitDirection().y(), v1.y() / dist));
     CHECK(hubert::isEqual(theRay.unitDirection().z(), v1.z() / dist));
 
+    CHECK(theRay.amValid());
     CHECK(isValid(theRay));
+
+    CHECK_FALSE(theRay.amDegenerate());
     CHECK_FALSE(isDegenerate(theRay));
 }
 
@@ -1590,7 +1710,10 @@ TEMPLATE_TEST_CASE("Construct Ray3 with initializer", "[Ray3]", float, double)
     CHECK(hubert::isEqual(theRay.unitDirection().y(), v1.y() / dist));
     CHECK(hubert::isEqual(theRay.unitDirection().z(), v1.z() / dist));
 
+    CHECK(theRay.amValid());
     CHECK(isValid(theRay));
+
+    CHECK_FALSE(theRay.amDegenerate());
     CHECK_FALSE(isDegenerate(theRay));
 }
 
@@ -1628,19 +1751,24 @@ TEMPLATE_TEST_CASE("Check Ray3 validity routines", "[Ray3]", float, double)
                     // we know the ray is valid (as opposed to degenerate) because it was
                     // directly constructed out of numbers known to be valid
                     CHECK(theRay.amValid());
+                    CHECK(isValid(theRay));
+
                     if (uv1.amDegenerate())
                     {
                         CHECK(theRay.amDegenerate());
+                        CHECK(isDegenerate(theRay));
                     }
                     else
                     {
                         CHECK_FALSE(theRay.amDegenerate());
+                        CHECK_FALSE(isDegenerate(theRay));
                     }
 
                     // we have already run the isValid test - so assuming it works, 
                     // this does too
                     bool tv = hubert::isSubnormal(p1) || hubert::isSubnormal(v1) || hubert::isSubnormal(uv1);
                     CHECK(theRay.amSubnormal() == tv);
+                    CHECK(isSubnormal(theRay) == tv);
                 }
             }
         }
@@ -1671,9 +1799,14 @@ TEMPLATE_TEST_CASE("Check Ray3 validity routines", "[Ray3]", float, double)
                                 CHECK(((std::isnan(theRay.base().y()) && std::isnan(p1.y())) || (theRay.base().y() == p1.y())));
                                 CHECK(((std::isnan(theRay.base().z()) && std::isnan(p1.z())) || (theRay.base().z() == p1.z())));
 
-                                CHECK(theRay.amValid() == false);
-                                CHECK(theRay.amDegenerate() == true);
-                                CHECK(theRay.amSubnormal() == false);
+                                CHECK_FALSE(theRay.amValid());
+                                CHECK_FALSE(isValid(theRay));
+
+                                CHECK(theRay.amDegenerate());
+                                CHECK(isDegenerate(theRay));
+
+                                CHECK_FALSE(theRay.amSubnormal());
+                                CHECK_FALSE(isSubnormal(theRay));
 
                                 CHECK_FALSE(hubert::isValid(theRay.unitDirection()));
                             }
@@ -1752,7 +1885,10 @@ TEMPLATE_TEST_CASE("Construct Segment3 with default parameters", "[Segment3]", f
     CHECK(theSegment.target().y() == TestType(1.0));
     CHECK(theSegment.target().z() == TestType(1.0));
 
+    CHECK(theSegment.amValid());
     CHECK(isValid(theSegment));
+
+    CHECK_FALSE(theSegment.amDegenerate());
     CHECK_FALSE(isDegenerate(theSegment));
 }
 
@@ -1771,7 +1907,10 @@ TEMPLATE_TEST_CASE("Construct Segment3 with constant parameters", "[Segment3]", 
     CHECK(theSegment.target().y() == p2.y());
     CHECK(theSegment.target().z() == p2.z());
 
+    CHECK(theSegment.amValid());
     CHECK(isValid(theSegment));
+
+    CHECK_FALSE(theSegment.amDegenerate());
     CHECK_FALSE(isDegenerate(theSegment));
 }
 
@@ -1790,7 +1929,10 @@ TEMPLATE_TEST_CASE("Construct Segment3 with copy  constructor", "[Segment3]", fl
     CHECK(theSegment.target().y() == p2.y());
     CHECK(theSegment.target().z() == p2.z());
 
+    CHECK(theSegment.amValid());
     CHECK(isValid(theSegment));
+
+    CHECK_FALSE(theSegment.amDegenerate());
     CHECK_FALSE(isDegenerate(theSegment));
 }
 
@@ -1809,7 +1951,10 @@ TEMPLATE_TEST_CASE("Construct Segment3 with assignment", "[Segment3]", float, do
     CHECK(theSegment.target().y() == p2.y());
     CHECK(theSegment.target().z() == p2.z());
 
+    CHECK(theSegment.amValid());
     CHECK(isValid(theSegment));
+
+    CHECK_FALSE(theSegment.amDegenerate());
     CHECK_FALSE(isDegenerate(theSegment));
 }
 
@@ -1827,7 +1972,10 @@ TEMPLATE_TEST_CASE("Construct Segment3 with initializer", "[Segment3]", float, d
     CHECK(theSegment.target().y() == p2.y());
     CHECK(theSegment.target().z() == p2.z());
 
+    CHECK(theSegment.amValid());
     CHECK(isValid(theSegment));
+
+    CHECK_FALSE(theSegment.amDegenerate());
     CHECK_FALSE(isDegenerate(theSegment));
 }
 
@@ -2388,3 +2536,4 @@ TEMPLATE_TEST_CASE("makeRay3(Point3, Point3)", "[make]", float, double)
     CHECK(hubert::isEqual(madeRay.unitDirection().y(), v1.y() / hubert::magnitude(v1)));
     CHECK(hubert::isEqual(madeRay.unitDirection().z(), v1.z() / hubert::magnitude(v1)));
 }
+
