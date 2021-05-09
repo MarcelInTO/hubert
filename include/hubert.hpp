@@ -409,11 +409,11 @@ class Matrix3 : public HubertBase
             return Matrix3(mt[0][0], mt[0][1], mt[0][2], mt[1][0], mt[1][1], mt[1][2], mt[2][0], mt[2][1], mt[2][2]);
         }
 
-        inline bool isIdentity() const 
+        inline bool isIdentity(T scale = T(1.0)) const 
         {
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
-                    if (!isEqual(_m[i][j], (i == j) ? T(1.0) : T(0.0))) {
+                    if (!isEqualScaled(_m[i][j], (i == j) ? T(1.0) : T(0.0), scale)) {
                         return false;
                     }
                 }
@@ -523,10 +523,14 @@ class MatrixRotation3 : public Matrix3<T>
                     newFlags |= HubertBase::cDegenerate;
                 }
 
-                // Multiplied by its transpose must be an identity
+                // Multiplied by its transpose must be an identity. Because we did
+                // a matrix multiply we have to scale the epsilon that will be used.
+                // Since we know all the columns are unit vectors, we don't worry
+                // about the magnitude of the values, but rather just on the number of
+                // operations performed
                 if (!(newFlags & HubertBase::cDegenerate))
                 {
-                    if (!(this->multiply(this->transpose()).isIdentity()))
+                    if (!(this->multiply(this->transpose()).isIdentity(T(4.0))))
                     {
                         newFlags |= HubertBase::cDegenerate;
                     }
