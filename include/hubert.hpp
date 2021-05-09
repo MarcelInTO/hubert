@@ -74,6 +74,20 @@ inline T infinity() { return std::numeric_limits<T>::infinity();}
 /////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
+inline bool isEqualScaled(T v1, T v2, T scale)
+{
+    T eps = scale * epsilon<T>();
+
+    if (v1 != 0.0 && v2 != 0.0)
+    {
+        return std::abs(v1 - v2) / std::abs(v1) <= eps && std::abs(v1 - v2) / std::abs(v2) <= eps;
+    }
+    else
+    {
+        return std::abs(v1 - v2) <= eps;
+    }
+}
+template <typename T>
 inline bool isEqual(T v1, T v2)
 {
     T eps = epsilon<T>();
@@ -157,8 +171,8 @@ class Point3 : public HubertBase
 {
     public:
         // constructors
-        Point3() : _x(T(0.0)), _y(T(0.0)), _z(T(0.0)) { _computeValidity(); }
-        Point3(T inX, T inY, T inZ) : _x(inX), _y(inY), _z(inZ) { _computeValidity(); }
+        Point3() : Point3(T(0.0), T(0.0), T(0.0)) {}
+        Point3(T inX, T inY, T inZ) { _validate(inX, inY, inZ); }
         Point3(const Point3 &) = default;
         ~Point3() = default;
 
@@ -172,8 +186,12 @@ class Point3 : public HubertBase
 
     private:
         // private methods
-        void _computeValidity()
+        void _validate(T inX, T inY, T inZ)
         {
+            _x = inX;
+            _y = inY;
+            _z = inZ;
+
             uint64_t newFlags = 0;
 
             if (isSubnormal(_x) || isSubnormal(_y) || isSubnormal(_z))
@@ -210,8 +228,8 @@ class Vector3 : public HubertBase
 {
     public:
         // constructors
-        Vector3() : _x(T(0.0)), _y(T(0.0)), _z(T(0.0)) { _computeValidity();}
-        Vector3(T inX, T inY, T inZ) : _x(inX), _y(inY), _z(inZ) { _computeValidity(); }
+        Vector3() : Vector3(T(0.0), T(0.0), T(0.0)) {}
+        Vector3(T inX, T inY, T inZ) { _validate(inX, inY, inZ); }
         Vector3(const Vector3 &) = default;
         ~Vector3() = default;
 
@@ -226,8 +244,12 @@ class Vector3 : public HubertBase
 
     private:
         // private methods
-        void _computeValidity()
+        void _validate(T inX, T inY, T inZ)
         {
+            _x = inX;
+            _y = inY;
+            _z = inZ;
+
             uint64_t newFlags = 0;
 
             if (isSubnormal(_x) || isSubnormal(_y) || isSubnormal(_z))
@@ -276,8 +298,8 @@ class UnitVector3 : public HubertBase
 {
     public:
         // constructors
-        UnitVector3() : _x(T(0.0)), _y(T(1.0)), _z(T(0.0)) { _normalizeAndValidate(); }
-        UnitVector3(T inX, T inY, T inZ) : _x(inX), _y(inY), _z(inZ) { _normalizeAndValidate(); }
+        UnitVector3() : UnitVector3(T(0.0), T(1.0), T(0.0)) {}
+        UnitVector3(T inX, T inY, T inZ){ _normalizeAndValidate(inX, inY, inZ); }
         UnitVector3(const UnitVector3 &) = default;
         ~UnitVector3() = default;
 
@@ -291,8 +313,12 @@ class UnitVector3 : public HubertBase
 
     private:
         // private methods
-        void _normalizeAndValidate()
+        void _normalizeAndValidate(T inX, T inY, T inZ)
         {
+            _x = inX;
+            _y = inY;
+            _z = inZ;
+
             uint64_t newFlags = 0;
 
            if (!(isValid(_x) && isValid(_y) && isValid(_z)))
@@ -338,6 +364,189 @@ class UnitVector3 : public HubertBase
         T   _z;
         T   _mag;
 };
+
+template <typename T>
+class Matrix3 : public HubertBase
+{
+    public:
+        // constructors
+        Matrix3() : _m{} {}
+        Matrix3(T r0c0, T r0c1, T r0c2, T r1c0, T r1c1, T r1c2, T r2c0, T r2c1, T r2c2) { _validate(r0c0, r0c1, r0c2, r1c0, r1c1, r1c2, r2c0, r2c1, r2c2); }
+        Matrix3(const Matrix3&) = default;
+        ~Matrix3() = default;
+
+        // public operators
+        inline Matrix3<T>& operator=(const Matrix3<T>&) = default;
+
+        // public methods
+        inline T get(uint32_t r, uint32_t c) const { return _m[r][c]; }
+        inline T getDeterminantEpsilonScale() const { return T(12.0) * _maxVal; }
+
+        inline Matrix3<T> transpose(void) const
+        {
+            Matrix3<T> mt(
+                _m[0][0], _m[1][0], _m[2][0],
+                _m[0][1], _m[1][1], _m[2][1],
+                _m[0][2], _m[1][2], _m[2][2]
+            );
+
+            return mt;
+        }
+
+        inline Matrix3<T> multiply(const Matrix3<T> m2) const
+        {
+           T mt[3][3];
+
+            for (int i = 0; i < 3; i++){
+                for (int j = 0; j < 3; j++) {
+                    mt[i][j] = T(0.0);
+                    for (int u = 0; u < 3; u++) {
+                        mt[i][j] += _m[i][u] * m2._m[u][j];
+                    }
+                }
+            }
+
+            return Matrix3(mt[0][0], mt[0][1], mt[0][2], mt[1][0], mt[1][1], mt[1][2], mt[2][0], mt[2][1], mt[2][2]);
+        }
+
+        inline bool isIdentity() const 
+        {
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if (!isEqual(_m[i][j], (i == j) ? T(1.0) : T(0.0))) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        inline T determinant() const
+        {
+            return (
+                _m[0][0] * (_m[1][1] * _m[2][2] - _m[2][1] * _m[1][2]) -
+                _m[0][1] * (_m[1][0] * _m[2][2] - _m[2][0] * _m[1][2]) +
+                _m[0][2] * (_m[1][0] * _m[2][1] - _m[2][0] * _m[1][1])
+            );
+        }
+
+    private:
+        // private methods
+        void _validate(T r0c0, T r0c1, T r0c2, T r1c0, T r1c1, T r1c2, T r2c0, T r2c1, T r2c2)
+        {
+            _m[0][0] = r0c0;
+            _m[1][0] = r1c0;
+            _m[2][0] = r2c0;
+            _m[0][1] = r0c1;
+            _m[1][1] = r1c1;
+            _m[2][1] = r2c1;
+            _m[0][2] = r0c2;
+            _m[1][2] = r1c2;
+            _m[2][2] = r2c2;
+
+            // we use the maximum value to scale epsilon
+            T* v = &_m[0][0];
+            for (int i = 0; i < 9; i++, v++)
+            {
+                if (std::abs(*v) > _maxVal)
+                {
+                    _maxVal = std::abs(*v);
+                }
+            }
+
+            uint64_t newFlags = 0;
+
+            // only reason for invalidity is the source data
+            v = &_m[0][0];
+            for (int i = 0; i < 9; i++, v++)
+            {
+                if (!isValid(*v))
+                {
+                    newFlags |= cInvalid;
+                    break;
+                }
+            }
+
+            // only do normalization checks if we are valid. There is no
+            // degeneracy case unrelated to validity.
+            if (!(newFlags & cInvalid))
+            {
+                v = &_m[0][0];
+                for (int i = 0; i < 9; i++, v++)
+                {
+                    if (isSubnormal(T(*v)))
+                    {
+                        newFlags |= cSubnormalData;
+                        break;
+                    }
+                }
+            }
+
+            setValidityFlags(newFlags);
+        }
+
+        // Don't allow direct access to the data
+        T   _m[3][3];
+        T   _maxVal = T(0.0);
+};
+
+
+template <typename T>
+class MatrixRotation3 : public Matrix3<T>
+{
+    public:
+        // constructors
+        MatrixRotation3() : MatrixRotation3(UnitVector3<T>(T(1.0), T(0.0), T(0.0)), UnitVector3<T>(T(0.0), T(1.0), T(0.0)), UnitVector3<T>(T(0.0), T(0.0), T(1.0)) ) {}
+        MatrixRotation3(const UnitVector3<T> & inX, const UnitVector3<T>& inY, const UnitVector3<T>& inZ) : Matrix3(inX.x(), inY.x(), inZ.x(), inX.y(), inY.y(), inZ.y(), inX.z(), inY.z(), inZ.z()) { _validate(inX, inY, inZ); }
+        MatrixRotation3(const MatrixRotation3&) = default;
+        ~MatrixRotation3() = default;
+
+        // public operators
+        inline MatrixRotation3<T>& operator=(const MatrixRotation3<T>&) = default;
+
+        // public methods
+
+    private:
+        // Rotation matrix specific validation
+        void _validate(const UnitVector3<T>& inX, const UnitVector3<T>& inY, const UnitVector3<T>& inZ)
+        {
+            uint64_t newFlags = 0;
+
+            // the validity & subnormality flags will already have been set by the parent class. 
+            // All we have to worry about is degeneracy checks specific to the Rotation matrix
+            if (!(newFlags & cInvalid))
+            {
+                // the incoming vectors must be legitimate unit vectors, otherwise the matrix
+                // does not stand a chance of being a rotation matrix.
+                if (isDegenerate(inX) || isDegenerate(inY) || isDegenerate(inZ))
+                {
+                    newFlags |= cDegenerate;
+                }
+
+                // Multiplied by its transpose must be an identity
+                if (!(newFlags & cDegenerate))
+                {
+                    if (!(this->multiply(this->transpose()).isIdentity()))
+                    {
+                        newFlags |= cDegenerate;
+                    }
+                }
+
+                // determinant must be 1
+                if (!(newFlags & cDegenerate))
+                {
+                    if (!isEqualScaled(this->determinant(), T(1.0), this->getDeterminantEpsilonScale()))
+                    {
+                        newFlags |= cDegenerate;
+                    }
+                }
+            }
+
+            setValidityFlags(newFlags);
+        }
+};
+
+
 
 
 //
@@ -848,6 +1057,18 @@ inline bool isValid(const UnitVector3<T> & v)
 }
 
 template <typename T>
+inline bool isValid(const Matrix3<T>& v)
+{
+    return v.amValid();
+}
+
+template <typename T>
+inline bool isValid(const MatrixRotation3<T>& v)
+{
+    return v.amValid();
+}
+
+template <typename T>
 inline bool isValid(const Line3<T> & v)
 {
     return v.amValid();
@@ -906,6 +1127,18 @@ inline bool isDegenerate(const UnitVector3<T> & v)
 }
 
 template <typename T>
+inline bool isDegenerate(const Matrix3<T>& v)
+{
+    return v.amDegenerate();
+}
+
+template <typename T>
+inline bool isDegenerate(const MatrixRotation3<T>& v)
+{
+    return v.amDegenerate();
+}
+
+template <typename T>
 inline bool isDegenerate(const Line3<T> & v)
 {
     return v.amDegenerate();
@@ -955,6 +1188,18 @@ inline bool isSubnormal(const Vector3<T> & v)
 
 template <typename T>
 inline bool isSubnormal(const UnitVector3<T> & v)
+{
+    return v.amSubnormal();
+}
+
+template <typename T>
+inline bool isSubnormal(const Matrix3<T>& v)
+{
+    return v.amSubnormal();
+}
+
+template <typename T>
+inline bool isSubnormal(const MatrixRotation3<T>& v)
 {
     return v.amSubnormal();
 }

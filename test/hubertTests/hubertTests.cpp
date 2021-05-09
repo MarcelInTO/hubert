@@ -972,6 +972,429 @@ TEMPLATE_TEST_CASE("UnitVector3 specific degeneracy", "[Line3]", float, double)
 }
 
 ///////////////////////////////////////////////////////////////////////////
+// Matrix3 construction tests 
+///////////////////////////////////////////////////////////////////////////
+
+TEMPLATE_TEST_CASE("Construct Matrix3 with default parameters", "[Matrix3]", float, double)
+{
+    hubert::Matrix3<TestType> theMatrix;
+
+    CHECK(theMatrix.get(0, 0) == TestType(0.0));
+    CHECK(theMatrix.get(0, 1) == TestType(0.0));
+    CHECK(theMatrix.get(0, 2) == TestType(0.0));
+    CHECK(theMatrix.get(1, 0) == TestType(0.0));
+    CHECK(theMatrix.get(1, 1) == TestType(0.0));
+    CHECK(theMatrix.get(1, 2) == TestType(0.0));
+    CHECK(theMatrix.get(2, 0) == TestType(0.0));
+    CHECK(theMatrix.get(2, 1) == TestType(0.0));
+    CHECK(theMatrix.get(2, 2) == TestType(0.0));
+
+    CHECK(hubert::isValid(theMatrix));
+    CHECK_FALSE(hubert::isDegenerate(theMatrix));
+}
+
+TEMPLATE_TEST_CASE("Construct Matrix3 with constant parameters", "[Matrix3]", float, double)
+{
+    hubert::Matrix3<TestType> theMatrix(TestType(1.1), TestType(2.2), TestType(3.3), TestType(4.4), TestType(5.5), TestType(6.6), TestType(7.7), TestType(8.8), TestType(9.9));
+
+    CHECK(theMatrix.get(0, 0) == TestType(1.1));
+    CHECK(theMatrix.get(0, 1) == TestType(2.2));
+    CHECK(theMatrix.get(0, 2) == TestType(3.3));
+    CHECK(theMatrix.get(1, 0) == TestType(4.4));
+    CHECK(theMatrix.get(1, 1) == TestType(5.5));
+    CHECK(theMatrix.get(1, 2) == TestType(6.6));
+    CHECK(theMatrix.get(2, 0) == TestType(7.7));
+    CHECK(theMatrix.get(2, 1) == TestType(8.8));
+    CHECK(theMatrix.get(2, 2) == TestType(9.9));
+
+    CHECK(hubert::isValid(theMatrix));
+    CHECK_FALSE(hubert::isDegenerate(theMatrix));
+}
+
+
+TEMPLATE_TEST_CASE("Construct Matrix3 with copy  constructor", "[Matrix3]", float, double)
+{
+    hubert::Matrix3<TestType> sourceMatrix(TestType(1.1), TestType(2.2), TestType(3.3), TestType(4.4), TestType(5.5), TestType(6.6), TestType(7.7), TestType(8.8), TestType(9.9));
+    hubert::Matrix3<TestType> theMatrix(sourceMatrix);
+
+    CHECK(theMatrix.get(0, 0) == TestType(1.1));
+    CHECK(theMatrix.get(0, 1) == TestType(2.2));
+    CHECK(theMatrix.get(0, 2) == TestType(3.3));
+    CHECK(theMatrix.get(1, 0) == TestType(4.4));
+    CHECK(theMatrix.get(1, 1) == TestType(5.5));
+    CHECK(theMatrix.get(1, 2) == TestType(6.6));
+    CHECK(theMatrix.get(2, 0) == TestType(7.7));
+    CHECK(theMatrix.get(2, 1) == TestType(8.8));
+    CHECK(theMatrix.get(2, 2) == TestType(9.9));
+
+    CHECK(hubert::isValid(theMatrix));
+    CHECK_FALSE(hubert::isDegenerate(theMatrix));
+}
+
+
+
+TEMPLATE_TEST_CASE("Construct Matrix3 with assignment", "[Matrix3]", float, double)
+{
+    hubert::Matrix3<TestType> sourceMatrix(TestType(1.1), TestType(2.2), TestType(3.3), TestType(4.4), TestType(5.5), TestType(6.6), TestType(7.7), TestType(8.8), TestType(9.9));
+    hubert::Matrix3<TestType> theMatrix = sourceMatrix;
+
+    CHECK(theMatrix.get(0, 0) == TestType(1.1));
+    CHECK(theMatrix.get(0, 1) == TestType(2.2));
+    CHECK(theMatrix.get(0, 2) == TestType(3.3));
+    CHECK(theMatrix.get(1, 0) == TestType(4.4));
+    CHECK(theMatrix.get(1, 1) == TestType(5.5));
+    CHECK(theMatrix.get(1, 2) == TestType(6.6));
+    CHECK(theMatrix.get(2, 0) == TestType(7.7));
+    CHECK(theMatrix.get(2, 1) == TestType(8.8));
+    CHECK(theMatrix.get(2, 2) == TestType(9.9));
+
+    CHECK(hubert::isValid(theMatrix));
+    CHECK_FALSE(hubert::isDegenerate(theMatrix));
+}
+
+
+TEMPLATE_TEST_CASE("Construct Matrix3 with initializer", "[Matrix3]", float, double)
+{
+    hubert::Matrix3<TestType> sourceMatrix(TestType(1.1), TestType(2.2), TestType(3.3), TestType(4.4), TestType(5.5), TestType(6.6), TestType(7.7), TestType(8.8), TestType(9.9));
+    hubert::Matrix3<TestType> theMatrix { sourceMatrix };
+
+    CHECK(theMatrix.get(0, 0) == TestType(1.1));
+    CHECK(theMatrix.get(0, 1) == TestType(2.2));
+    CHECK(theMatrix.get(0, 2) == TestType(3.3));
+    CHECK(theMatrix.get(1, 0) == TestType(4.4));
+    CHECK(theMatrix.get(1, 1) == TestType(5.5));
+    CHECK(theMatrix.get(1, 2) == TestType(6.6));
+    CHECK(theMatrix.get(2, 0) == TestType(7.7));
+    CHECK(theMatrix.get(2, 1) == TestType(8.8));
+    CHECK(theMatrix.get(2, 2) == TestType(9.9));
+
+    CHECK(hubert::isValid(theMatrix));
+    CHECK_FALSE(hubert::isDegenerate(theMatrix));
+}
+
+///////////////////////////////////////////////////////////////////////////
+// Matrix3 validity 
+///////////////////////////////////////////////////////////////////////////
+
+TEMPLATE_TEST_CASE("Check Matrix3 validity routines", "[Matrix3]", float, double)
+{
+    SECTION("Valid")
+    {
+        for (auto x : gSetup.getValid<TestType>())
+        {
+            for (auto y : gSetup.getValid<TestType>())
+            {
+                for (auto z : gSetup.getValid<TestType>())
+                {
+                    hubert::Matrix3<TestType> theMatrix{ x, y, z, y, z, x, z, x, y };
+
+                    CHECK(theMatrix.amValid());
+                    CHECK(isValid(theMatrix));
+
+                    CHECK_FALSE(theMatrix.amDegenerate());
+                    CHECK_FALSE(isDegenerate(theMatrix));
+
+                    // we have already run the isValid test - so assuming it works, 
+                    // this does too
+                    bool tv = hubert::isSubnormal(x) || hubert::isSubnormal(y) || hubert::isSubnormal(z);
+                    CHECK(theMatrix.amSubnormal() == tv);
+                    CHECK(isSubnormal(theMatrix) == tv);
+                }
+            }
+        }
+    }
+
+    SECTION("Invalid")
+    {
+        for (auto x : gSetup.getInvalid<TestType>())
+        {
+            for (auto y : gSetup.getInvalid<TestType>())
+            {
+                for (auto z : gSetup.getInvalid<TestType>())
+                {
+                    hubert::Matrix3<TestType> theMatrix{ x, y, z, y, z, x, z, x, y };
+
+                    CHECK_FALSE(theMatrix.amValid());
+                    CHECK_FALSE(isValid(theMatrix));
+
+                    CHECK(theMatrix.amDegenerate());
+                    CHECK(isDegenerate(theMatrix));
+
+                    CHECK_FALSE(theMatrix.amSubnormal());
+                    CHECK_FALSE(isSubnormal(theMatrix));
+                }
+            }
+        }
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////
+// Matrix3 specific degeneracy tests 
+///////////////////////////////////////////////////////////////////////////
+
+// there are currently no non-validity related degeneracy cases for Matrix3
+
+///////////////////////////////////////////////////////////////////////////
+// Matrix3 public  function 
+///////////////////////////////////////////////////////////////////////////
+
+TEMPLATE_TEST_CASE("Test transpose() function", "[Matrix3]", float, double)
+{
+    hubert::Matrix3<TestType> sourceMatrix(TestType(1.1), TestType(2.2), TestType(3.3), TestType(4.4), TestType(5.5), TestType(6.6), TestType(7.7), TestType(8.8), TestType(9.9));
+
+    hubert::Matrix3<TestType> theMatrix(sourceMatrix.transpose());
+
+    CHECK(theMatrix.get(0, 0) == sourceMatrix.get(0, 0));
+    CHECK(theMatrix.get(0, 1) == sourceMatrix.get(1, 0));
+    CHECK(theMatrix.get(0, 2) == sourceMatrix.get(2, 0));
+    CHECK(theMatrix.get(1, 0) == sourceMatrix.get(0, 1));
+    CHECK(theMatrix.get(1, 1) == sourceMatrix.get(1, 1));
+    CHECK(theMatrix.get(1, 2) == sourceMatrix.get(2, 1));
+    CHECK(theMatrix.get(2, 0) == sourceMatrix.get(0, 2));
+    CHECK(theMatrix.get(2, 1) == sourceMatrix.get(1, 2));
+    CHECK(theMatrix.get(2, 2) == sourceMatrix.get(2, 2));
+
+    CHECK(hubert::isValid(sourceMatrix) == hubert::isValid(theMatrix));
+    CHECK(hubert::isDegenerate(sourceMatrix) == hubert::isDegenerate(theMatrix));
+}
+
+TEMPLATE_TEST_CASE("Test isIdentity() function", "[Matrix3]", float, double)
+{
+    hubert::Matrix3<TestType> sourceMatrix1(TestType(1.1), TestType(2.2), TestType(3.3), TestType(4.4), TestType(5.5), TestType(6.6), TestType(7.7), TestType(8.8), TestType(9.9));
+    hubert::Matrix3<TestType> sourceMatrix2(TestType(1.0), TestType(0.0), TestType(0.0), TestType(0.0), TestType(1.0), TestType(0.0), TestType(0.0), TestType(0.0), TestType(1.0));
+
+    CHECK_FALSE(sourceMatrix1.isIdentity());
+    CHECK(sourceMatrix2.isIdentity());
+}
+
+TEMPLATE_TEST_CASE("Test determinant() function", "[Matrix3]", float, double)
+{
+    SECTION("Det is 0")
+    {
+        hubert::Matrix3<TestType> sourceMatrix(TestType(1.1), TestType(2.2), TestType(3.3), TestType(4.4), TestType(5.5), TestType(6.6), TestType(7.7), TestType(8.8), TestType(9.9));
+        CHECK(hubert::isEqualScaled(sourceMatrix.determinant(), TestType(0.0), sourceMatrix.getDeterminantEpsilonScale()));
+    }
+    SECTION("Det is non-0")
+    {
+        hubert::Matrix3<TestType> sourceMatrix(TestType(1.1), TestType(2.2), TestType(3.3), TestType(4.4), TestType(0.0), TestType(6.6), TestType(7.7), TestType(8.8), TestType(9.9));
+        CHECK(hubert::isEqualScaled(sourceMatrix.determinant(), TestType(79.86), sourceMatrix.getDeterminantEpsilonScale()));
+    }
+}
+
+TEMPLATE_TEST_CASE("Test multiply() function", "[Matrix3]", float, double)
+{
+    SECTION("Case 1")
+    {
+        hubert::Matrix3<TestType> matrix1(TestType(1.1), TestType(2.2), TestType(3.3), TestType(4.4), TestType(5.5), TestType(6.6), TestType(7.7), TestType(8.8), TestType(9.9));
+        hubert::Matrix3<TestType> matrix2(matrix1.transpose());
+
+        hubert::Matrix3<TestType> ret(matrix1.multiply(matrix2));
+
+        CHECK(hubert::isEqual(ret.get(0, 0), TestType(16.94)));
+        CHECK(hubert::isEqual(ret.get(0, 1), TestType(38.72)));
+        CHECK(hubert::isEqual(ret.get(0, 2), TestType(60.5)));
+        CHECK(hubert::isEqual(ret.get(1, 0), TestType(38.72)));
+        CHECK(hubert::isEqual(ret.get(1, 1), TestType(93.17)));
+        CHECK(hubert::isEqual(ret.get(1, 2), TestType(147.62)));
+        CHECK(hubert::isEqual(ret.get(2, 0), TestType(60.5)));
+        CHECK(hubert::isEqual(ret.get(2, 1), TestType(147.62)));
+        CHECK(hubert::isEqual(ret.get(2, 2), TestType(234.74)));
+    }
+    SECTION("Case 2")
+    {
+        hubert::Matrix3<TestType> matrix1(TestType(1.1), TestType(2.2), TestType(3.3), TestType(4.4), TestType(5.5), TestType(6.6), TestType(7.7), TestType(8.8), TestType(9.9));
+        hubert::Matrix3<TestType> matrix2(TestType(1.1), TestType(-2.2), TestType(3.3), TestType(-4.4), TestType(5.5), TestType(-6.6), TestType(7.7), TestType(-8.8), TestType(9.9));
+
+        hubert::Matrix3<TestType> ret(matrix1.multiply(matrix2));
+
+        CHECK(hubert::isEqual(ret.get(0, 0), TestType(16.94)));
+        CHECK(hubert::isEqual(ret.get(0, 1), TestType(-19.36)));
+        CHECK(hubert::isEqual(ret.get(0, 2), TestType(21.78)));
+        CHECK(hubert::isEqual(ret.get(1, 0), TestType(31.46)));
+        CHECK(hubert::isEqual(ret.get(1, 1), TestType(-37.51)));
+        CHECK(hubert::isEqual(ret.get(1, 2), TestType(43.56)));
+        CHECK(hubert::isEqual(ret.get(2, 0), TestType(45.98)));
+        CHECK(hubert::isEqual(ret.get(2, 1), TestType(-55.66)));
+        CHECK(hubert::isEqual(ret.get(2, 2), TestType(65.34)));
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////
+// MatrixRotation3 construction tests 
+///////////////////////////////////////////////////////////////////////////
+
+TEMPLATE_TEST_CASE("Construct MatrixRotation3 with default parameters", "[MatrixRotation3]", float, double)
+{
+    hubert::MatrixRotation3<TestType> theMatrix;
+
+    CHECK(theMatrix.get(0, 0) == TestType(1.0));
+    CHECK(theMatrix.get(0, 1) == TestType(0.0));
+    CHECK(theMatrix.get(0, 2) == TestType(0.0));
+    CHECK(theMatrix.get(1, 0) == TestType(0.0));
+    CHECK(theMatrix.get(1, 1) == TestType(1.0));
+    CHECK(theMatrix.get(1, 2) == TestType(0.0));
+    CHECK(theMatrix.get(2, 0) == TestType(0.0));
+    CHECK(theMatrix.get(2, 1) == TestType(0.0));
+    CHECK(theMatrix.get(2, 2) == TestType(1.0));
+
+    CHECK(hubert::isValid(theMatrix));
+    CHECK_FALSE(hubert::isDegenerate(theMatrix));
+}
+
+TEMPLATE_TEST_CASE("Construct MatrixRotation3 with constant parameters", "[MatrixRotation3]", float, double)
+{
+    hubert::UnitVector3<TestType> uv1(TestType(0.8911844994581091), TestType(-0.2924131506006626), TestType(-0.34682090087160805));
+    hubert::UnitVector3<TestType> uv2(TestType(0.34682090087160805), TestType(0.9319903121613182), TestType(0.1054007625971222));
+    hubert::UnitVector3<TestType> uv3(TestType(0.2924131506006626), TestType(-0.21421626313901312), TestType(0.9319903121613182));
+
+    hubert::MatrixRotation3<TestType> theMatrix(uv1, uv2, uv3);
+
+    CHECK(theMatrix.get(0, 0) == TestType(uv1.x()));
+    CHECK(theMatrix.get(0, 1) == TestType(uv2.x()));
+    CHECK(theMatrix.get(0, 2) == TestType(uv3.x()));
+    CHECK(theMatrix.get(1, 0) == TestType(uv1.y()));
+    CHECK(theMatrix.get(1, 1) == TestType(uv2.y()));
+    CHECK(theMatrix.get(1, 2) == TestType(uv3.y()));
+    CHECK(theMatrix.get(2, 0) == TestType(uv1.z()));
+    CHECK(theMatrix.get(2, 1) == TestType(uv2.z()));
+    CHECK(theMatrix.get(2, 2) == TestType(uv3.z()));
+
+    CHECK(hubert::isValid(theMatrix));
+    CHECK_FALSE(hubert::isDegenerate(theMatrix));
+}
+
+TEMPLATE_TEST_CASE("Construct MatrixRotation3 with copy  constructor", "[MatrixRotation3]", float, double)
+{
+    hubert::UnitVector3<TestType> uv1(TestType(0.8911844994581091), TestType(-0.2924131506006626), TestType(-0.34682090087160805));
+    hubert::UnitVector3<TestType> uv2(TestType(0.34682090087160805), TestType(0.9319903121613182), TestType(0.1054007625971222));
+    hubert::UnitVector3<TestType> uv3(TestType(0.2924131506006626), TestType(-0.21421626313901312), TestType(0.9319903121613182));
+
+    hubert::MatrixRotation3<TestType> sourceMatrix(uv1, uv2, uv3);
+    hubert::MatrixRotation3<TestType> theMatrix(sourceMatrix);
+
+    CHECK(theMatrix.get(0, 0) == TestType(uv1.x()));
+    CHECK(theMatrix.get(0, 1) == TestType(uv2.x()));
+    CHECK(theMatrix.get(0, 2) == TestType(uv3.x()));
+    CHECK(theMatrix.get(1, 0) == TestType(uv1.y()));
+    CHECK(theMatrix.get(1, 1) == TestType(uv2.y()));
+    CHECK(theMatrix.get(1, 2) == TestType(uv3.y()));
+    CHECK(theMatrix.get(2, 0) == TestType(uv1.z()));
+    CHECK(theMatrix.get(2, 1) == TestType(uv2.z()));
+    CHECK(theMatrix.get(2, 2) == TestType(uv3.z()));
+
+    CHECK(hubert::isValid(theMatrix));
+    CHECK_FALSE(hubert::isDegenerate(theMatrix));
+}
+
+TEMPLATE_TEST_CASE("Construct MatrixRotation3 with assignment", "[MatrixRotation3]", float, double)
+{
+    hubert::UnitVector3<TestType> uv1(TestType(0.8911844994581091), TestType(-0.2924131506006626), TestType(-0.34682090087160805));
+    hubert::UnitVector3<TestType> uv2(TestType(0.34682090087160805), TestType(0.9319903121613182), TestType(0.1054007625971222));
+    hubert::UnitVector3<TestType> uv3(TestType(0.2924131506006626), TestType(-0.21421626313901312), TestType(0.9319903121613182));
+
+    hubert::MatrixRotation3<TestType> sourceMatrix(uv1, uv2, uv3);
+    hubert::MatrixRotation3<TestType> theMatrix = sourceMatrix;
+
+    CHECK(theMatrix.get(0, 0) == TestType(uv1.x()));
+    CHECK(theMatrix.get(0, 1) == TestType(uv2.x()));
+    CHECK(theMatrix.get(0, 2) == TestType(uv3.x()));
+    CHECK(theMatrix.get(1, 0) == TestType(uv1.y()));
+    CHECK(theMatrix.get(1, 1) == TestType(uv2.y()));
+    CHECK(theMatrix.get(1, 2) == TestType(uv3.y()));
+    CHECK(theMatrix.get(2, 0) == TestType(uv1.z()));
+    CHECK(theMatrix.get(2, 1) == TestType(uv2.z()));
+    CHECK(theMatrix.get(2, 2) == TestType(uv3.z()));
+
+    CHECK(hubert::isValid(theMatrix));
+    CHECK_FALSE(hubert::isDegenerate(theMatrix));
+}
+
+
+TEMPLATE_TEST_CASE("Construct MatrixRotation3 with initializer", "[MatrixRotation3]", float, double)
+{
+    hubert::UnitVector3<TestType> uv1(TestType(0.8911844994581091), TestType(-0.2924131506006626), TestType(-0.34682090087160805));
+    hubert::UnitVector3<TestType> uv2(TestType(0.34682090087160805), TestType(0.9319903121613182), TestType(0.1054007625971222));
+    hubert::UnitVector3<TestType> uv3(TestType(0.2924131506006626), TestType(-0.21421626313901312), TestType(0.9319903121613182));
+
+    hubert::MatrixRotation3<TestType> sourceMatrix(uv1, uv2, uv3);
+    hubert::MatrixRotation3<TestType> theMatrix { sourceMatrix };
+
+    CHECK(theMatrix.get(0, 0) == TestType(uv1.x()));
+    CHECK(theMatrix.get(0, 1) == TestType(uv2.x()));
+    CHECK(theMatrix.get(0, 2) == TestType(uv3.x()));
+    CHECK(theMatrix.get(1, 0) == TestType(uv1.y()));
+    CHECK(theMatrix.get(1, 1) == TestType(uv2.y()));
+    CHECK(theMatrix.get(1, 2) == TestType(uv3.y()));
+    CHECK(theMatrix.get(2, 0) == TestType(uv1.z()));
+    CHECK(theMatrix.get(2, 1) == TestType(uv2.z()));
+    CHECK(theMatrix.get(2, 2) == TestType(uv3.z()));
+
+    CHECK(hubert::isValid(theMatrix));
+    CHECK_FALSE(hubert::isDegenerate(theMatrix));
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+// MatrixRotation3 validity 
+///////////////////////////////////////////////////////////////////////////
+
+// matrix validity is determined by the parent Matrix3 class
+
+///////////////////////////////////////////////////////////////////////////
+// MatrixRotation3 specific degeneracy tests 
+///////////////////////////////////////////////////////////////////////////
+
+TEMPLATE_TEST_CASE(" MatrixRotation3 specific degeneracy test", "[MatrixRotation3]", float, double)
+{
+    SECTION("Valid Rotation matrix")
+    {
+        hubert::UnitVector3<TestType> uv1(TestType(0.8911844994581091), TestType(-0.2924131506006626), TestType(-0.34682090087160805));
+        hubert::UnitVector3<TestType> uv2(TestType(0.34682090087160805), TestType(0.9319903121613182), TestType(0.1054007625971222));
+        hubert::UnitVector3<TestType> uv3(TestType(0.2924131506006626), TestType(-0.21421626313901312), TestType(0.9319903121613182));
+
+        hubert::MatrixRotation3<TestType> sourceMatrix(uv1, uv2, uv3);
+        hubert::MatrixRotation3<TestType> theMatrix{ sourceMatrix };
+
+        CHECK(theMatrix.get(0, 0) == TestType(uv1.x()));
+        CHECK(theMatrix.get(0, 1) == TestType(uv2.x()));
+        CHECK(theMatrix.get(0, 2) == TestType(uv3.x()));
+        CHECK(theMatrix.get(1, 0) == TestType(uv1.y()));
+        CHECK(theMatrix.get(1, 1) == TestType(uv2.y()));
+        CHECK(theMatrix.get(1, 2) == TestType(uv3.y()));
+        CHECK(theMatrix.get(2, 0) == TestType(uv1.z()));
+        CHECK(theMatrix.get(2, 1) == TestType(uv2.z()));
+        CHECK(theMatrix.get(2, 2) == TestType(uv3.z()));
+
+        CHECK(hubert::isValid(theMatrix));
+        CHECK_FALSE(hubert::isDegenerate(theMatrix));
+    }
+
+    SECTION("Invalid Rotation matrix - two columns same")
+    {
+        hubert::UnitVector3<TestType> uv1(TestType(0.8911844994581091), TestType(-0.2924131506006626), TestType(-0.34682090087160805));
+        hubert::UnitVector3<TestType> uv2(TestType(0.34682090087160805), TestType(0.9319903121613182), TestType(0.1054007625971222));
+        hubert::UnitVector3<TestType> uv3(TestType(0.34682090087160805), TestType(0.9319903121613182), TestType(0.1054007625971222));
+
+        hubert::MatrixRotation3<TestType> sourceMatrix(uv1, uv2, uv3);
+        hubert::MatrixRotation3<TestType> theMatrix{ sourceMatrix };
+
+        CHECK(theMatrix.get(0, 0) == TestType(uv1.x()));
+        CHECK(theMatrix.get(0, 1) == TestType(uv2.x()));
+        CHECK(theMatrix.get(0, 2) == TestType(uv3.x()));
+        CHECK(theMatrix.get(1, 0) == TestType(uv1.y()));
+        CHECK(theMatrix.get(1, 1) == TestType(uv2.y()));
+        CHECK(theMatrix.get(1, 2) == TestType(uv3.y()));
+        CHECK(theMatrix.get(2, 0) == TestType(uv1.z()));
+        CHECK(theMatrix.get(2, 1) == TestType(uv2.z()));
+        CHECK(theMatrix.get(2, 2) == TestType(uv3.z()));
+
+        CHECK(hubert::isValid(theMatrix));
+        CHECK(hubert::isDegenerate(theMatrix));
+    }
+}
+
+
+///////////////////////////////////////////////////////////////////////////
 // Line3 construction tests 
 ///////////////////////////////////////////////////////////////////////////
 
