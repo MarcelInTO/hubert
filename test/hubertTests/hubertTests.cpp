@@ -1406,15 +1406,15 @@ TEMPLATE_TEST_CASE("Test MatrixRotation3 transpose() function", "[MatrixRotation
 
     hubert::MatrixRotation3<TestType> theMatrix(sourceMatrix.transpose());
 
-    CHECK(theMatrix.get(0, 0) == sourceMatrix.get(0, 0));
-    CHECK(theMatrix.get(0, 1) == sourceMatrix.get(1, 0));
-    CHECK(theMatrix.get(0, 2) == sourceMatrix.get(2, 0));
-    CHECK(theMatrix.get(1, 0) == sourceMatrix.get(0, 1));
-    CHECK(theMatrix.get(1, 1) == sourceMatrix.get(1, 1));
-    CHECK(theMatrix.get(1, 2) == sourceMatrix.get(2, 1));
-    CHECK(theMatrix.get(2, 0) == sourceMatrix.get(0, 2));
-    CHECK(theMatrix.get(2, 1) == sourceMatrix.get(1, 2));
-    CHECK(theMatrix.get(2, 2) == sourceMatrix.get(2, 2));
+    CHECK(hubert::isEqual(theMatrix.get(0, 0), sourceMatrix.get(0, 0)));
+    CHECK(hubert::isEqual(theMatrix.get(0, 1), sourceMatrix.get(1, 0)));
+    CHECK(hubert::isEqual(theMatrix.get(0, 2), sourceMatrix.get(2, 0)));
+    CHECK(hubert::isEqual(theMatrix.get(1, 0), sourceMatrix.get(0, 1)));
+    CHECK(hubert::isEqual(theMatrix.get(1, 1), sourceMatrix.get(1, 1)));
+    CHECK(hubert::isEqual(theMatrix.get(1, 2), sourceMatrix.get(2, 1)));
+    CHECK(hubert::isEqual(theMatrix.get(2, 0), sourceMatrix.get(0, 2)));
+    CHECK(hubert::isEqual(theMatrix.get(2, 1), sourceMatrix.get(1, 2)));
+    CHECK(hubert::isEqual(theMatrix.get(2, 2), sourceMatrix.get(2, 2)));
 
     CHECK(hubert::isValid(sourceMatrix) == hubert::isValid(theMatrix));
     CHECK(hubert::isDegenerate(sourceMatrix) == hubert::isDegenerate(theMatrix));

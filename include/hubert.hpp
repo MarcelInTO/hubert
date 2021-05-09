@@ -512,9 +512,9 @@ class MatrixRotation3 : public Matrix3<T>
         inline MatrixRotation3<T> transpose(void) const 
         {
             MatrixRotation3<T> mt(
-                UnitVector3(_m[0][0], _m[0][1], _m[0][2]),
-                UnitVector3(_m[1][0], _m[1][1], _m[1][2]),
-                UnitVector3(_m[2][0], _m[2][1], _m[2][2])
+                UnitVector3(this->_m[0][0], this->_m[0][1], this->_m[0][2]),
+                UnitVector3(this->_m[1][0], this->_m[1][1], this->_m[1][2]),
+                UnitVector3(this->_m[2][0], this->_m[2][1], this->_m[2][2])
                 );
 
             return mt;
@@ -528,7 +528,7 @@ class MatrixRotation3 : public Matrix3<T>
                 for (int j = 0; j < 3; j++) {
                     mt[i][j] = T(0.0);
                     for (int u = 0; u < 3; u++) {
-                        mt[i][j] += _m[i][u] * m2._m[u][j];
+                        mt[i][j] += this->_m[i][u] * m2._m[u][j];
                     }
                 }
             }
@@ -566,7 +566,7 @@ class MatrixRotation3 : public Matrix3<T>
                 {
                     // Force using the parent class so that we don't do this validation
                     // routine recursively
-                    if (!(Matrix3::multiply(Matrix3::transpose()).isIdentity(T(4.0))))
+                    if (!(Matrix3<T>::multiply(Matrix3<T>::transpose()).isIdentity(T(4.0))))
                     {
                         newFlags |= HubertBase::cDegenerate;
                     }
