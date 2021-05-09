@@ -497,7 +497,7 @@ class MatrixRotation3 : public Matrix3<T>
     public:
         // constructors
         MatrixRotation3() : MatrixRotation3(UnitVector3<T>(T(1.0), T(0.0), T(0.0)), UnitVector3<T>(T(0.0), T(1.0), T(0.0)), UnitVector3<T>(T(0.0), T(0.0), T(1.0)) ) {}
-        MatrixRotation3(const UnitVector3<T> & inX, const UnitVector3<T>& inY, const UnitVector3<T>& inZ) : Matrix3(inX.x(), inY.x(), inZ.x(), inX.y(), inY.y(), inZ.y(), inX.z(), inY.z(), inZ.z()) { _validate(inX, inY, inZ); }
+        MatrixRotation3(const UnitVector3<T> & inX, const UnitVector3<T>& inY, const UnitVector3<T>& inZ) : Matrix3<T>(inX.x(), inY.x(), inZ.x(), inX.y(), inY.y(), inZ.y(), inX.z(), inY.z(), inZ.z()) { _validate(inX, inY, inZ); }
         MatrixRotation3(const MatrixRotation3&) = default;
         ~MatrixRotation3() = default;
 
@@ -514,35 +514,35 @@ class MatrixRotation3 : public Matrix3<T>
 
             // the validity & subnormality flags will already have been set by the parent class. 
             // All we have to worry about is degeneracy checks specific to the Rotation matrix
-            if (!(newFlags & cInvalid))
+            if (!(newFlags & HubertBase::cInvalid))
             {
                 // the incoming vectors must be legitimate unit vectors, otherwise the matrix
                 // does not stand a chance of being a rotation matrix.
                 if (isDegenerate(inX) || isDegenerate(inY) || isDegenerate(inZ))
                 {
-                    newFlags |= cDegenerate;
+                    newFlags |= HubertBase::cDegenerate;
                 }
 
                 // Multiplied by its transpose must be an identity
-                if (!(newFlags & cDegenerate))
+                if (!(newFlags & HubertBase::cDegenerate))
                 {
                     if (!(this->multiply(this->transpose()).isIdentity()))
                     {
-                        newFlags |= cDegenerate;
+                        newFlags |= HubertBase::cDegenerate;
                     }
                 }
 
                 // determinant must be 1
-                if (!(newFlags & cDegenerate))
+                if (!(newFlags & HubertBase::cDegenerate))
                 {
                     if (!isEqualScaled(this->determinant(), T(1.0), this->getDeterminantEpsilonScale()))
                     {
-                        newFlags |= cDegenerate;
+                        newFlags |= HubertBase::cDegenerate;
                     }
                 }
             }
 
-            setValidityFlags(newFlags);
+            this->setValidityFlags(newFlags);
         }
 };
 
