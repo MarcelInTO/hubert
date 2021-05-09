@@ -430,6 +430,11 @@ class Matrix3 : public HubertBase
             );
         }
 
+
+    protected:
+        T   _m[3][3];
+
+
     private:
         // private methods
         void _validate(T r0c0, T r0c1, T r0c2, T r1c0, T r1c1, T r1c2, T r2c0, T r2c1, T r2c2)
@@ -486,7 +491,6 @@ class Matrix3 : public HubertBase
         }
 
         // Don't allow direct access to the data
-        T   _m[3][3];
         T   _maxVal = T(0.0);
 };
 
@@ -505,6 +509,36 @@ class MatrixRotation3 : public Matrix3<T>
         inline MatrixRotation3<T>& operator=(const MatrixRotation3<T>&) = default;
 
         // public methods
+        inline MatrixRotation3<T> transpose(void) const 
+        {
+            MatrixRotation3<T> mt(
+                UnitVector3(_m[0][0], _m[0][1], _m[0][2]),
+                UnitVector3(_m[1][0], _m[1][1], _m[1][2]),
+                UnitVector3(_m[2][0], _m[2][1], _m[2][2])
+                );
+
+            return mt;
+        }
+
+        inline MatrixRotation3<T> multiply(const MatrixRotation3<T> m2) const
+        {
+            T mt[3][3];
+
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    mt[i][j] = T(0.0);
+                    for (int u = 0; u < 3; u++) {
+                        mt[i][j] += _m[i][u] * m2._m[u][j];
+                    }
+                }
+            }
+
+            return MatrixRotation3(
+                UnitVector3(mt[0][0], mt[1][0], mt[2][0]),
+                UnitVector3(mt[0][1], mt[1][1], mt[2][1]),
+                UnitVector3(mt[0][2], mt[1][2], mt[2][2])
+            );
+        }
 
     private:
         // Rotation matrix specific validation
@@ -530,7 +564,9 @@ class MatrixRotation3 : public Matrix3<T>
                 // operations performed
                 if (!(newFlags & HubertBase::cDegenerate))
                 {
-                    if (!(this->multiply(this->transpose()).isIdentity(T(4.0))))
+                    // Force using the parent class so that we don't do this validation
+                    // routine recursively
+                    if (!(Matrix3::multiply(Matrix3::transpose()).isIdentity(T(4.0))))
                     {
                         newFlags |= HubertBase::cDegenerate;
                     }

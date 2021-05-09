@@ -1393,6 +1393,56 @@ TEMPLATE_TEST_CASE(" MatrixRotation3 specific degeneracy test", "[MatrixRotation
     }
 }
 
+///////////////////////////////////////////////////////////////////////////
+// MatrixRotation3 construction tests 
+///////////////////////////////////////////////////////////////////////////
+
+TEMPLATE_TEST_CASE("Test MatrixRotation3 transpose() function", "[MatrixRotation3]", float, double)
+{
+    hubert::UnitVector3<TestType> uv1(TestType(0.8911844994581091), TestType(-0.2924131506006626), TestType(-0.34682090087160805));
+    hubert::UnitVector3<TestType> uv2(TestType(0.34682090087160805), TestType(0.9319903121613182), TestType(0.1054007625971222));
+    hubert::UnitVector3<TestType> uv3(TestType(0.2924131506006626), TestType(-0.21421626313901312), TestType(0.9319903121613182));
+    hubert::MatrixRotation3<TestType> sourceMatrix(uv1, uv2, uv3);
+
+    hubert::MatrixRotation3<TestType> theMatrix(sourceMatrix.transpose());
+
+    CHECK(theMatrix.get(0, 0) == sourceMatrix.get(0, 0));
+    CHECK(theMatrix.get(0, 1) == sourceMatrix.get(1, 0));
+    CHECK(theMatrix.get(0, 2) == sourceMatrix.get(2, 0));
+    CHECK(theMatrix.get(1, 0) == sourceMatrix.get(0, 1));
+    CHECK(theMatrix.get(1, 1) == sourceMatrix.get(1, 1));
+    CHECK(theMatrix.get(1, 2) == sourceMatrix.get(2, 1));
+    CHECK(theMatrix.get(2, 0) == sourceMatrix.get(0, 2));
+    CHECK(theMatrix.get(2, 1) == sourceMatrix.get(1, 2));
+    CHECK(theMatrix.get(2, 2) == sourceMatrix.get(2, 2));
+
+    CHECK(hubert::isValid(sourceMatrix) == hubert::isValid(theMatrix));
+    CHECK(hubert::isDegenerate(sourceMatrix) == hubert::isDegenerate(theMatrix));
+}
+
+TEMPLATE_TEST_CASE("Test MatrixRotation3 multiply() function", "[MatrixRotation3]", float, double)
+{
+    SECTION("Case 1")
+    {
+        hubert::UnitVector3<TestType> uv1(TestType(0.8911844994581091), TestType(-0.2924131506006626), TestType(-0.34682090087160805));
+        hubert::UnitVector3<TestType> uv2(TestType(0.34682090087160805), TestType(0.9319903121613182), TestType(0.1054007625971222));
+        hubert::UnitVector3<TestType> uv3(TestType(0.2924131506006626), TestType(-0.21421626313901312), TestType(0.9319903121613182));
+        hubert::MatrixRotation3<TestType> matrix1(uv1, uv2, uv3);
+        hubert::MatrixRotation3<TestType> matrix2(matrix1.transpose());
+
+        hubert::MatrixRotation3<TestType> ret(matrix1.multiply(matrix2));
+
+        CHECK(hubert::isEqual(ret.get(0, 0), TestType(1.0)));
+        CHECK(hubert::isEqual(ret.get(0, 1), TestType(0.0)));
+        CHECK(hubert::isEqual(ret.get(0, 2), TestType(0.0)));
+        CHECK(hubert::isEqual(ret.get(1, 0), TestType(0.0)));
+        CHECK(hubert::isEqual(ret.get(1, 1), TestType(1.0)));
+        CHECK(hubert::isEqual(ret.get(1, 2), TestType(0.0)));
+        CHECK(hubert::isEqual(ret.get(2, 0), TestType(0.0)));
+        CHECK(hubert::isEqual(ret.get(2, 1), TestType(0.0)));
+        CHECK(hubert::isEqual(ret.get(2, 2), TestType(1.0)));
+    }
+}
 
 ///////////////////////////////////////////////////////////////////////////
 // Line3 construction tests 
