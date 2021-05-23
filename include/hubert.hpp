@@ -114,6 +114,14 @@ inline bool isLessOrEqual(T v1, T v2)
     return (v1 < v2) || isEqual(v1, v2);
 }
 
+template <typename T>
+inline T difference(T v1, T v2)
+{
+    return std::abs(v1 - v2);
+}
+
+
+
 /////////////////////////////////////////////////////////////////////////////
 // Validation checks on primitive types
 /////////////////////////////////////////////////////////////////////////////
@@ -421,6 +429,18 @@ class Matrix3 : public HubertBase
             return true;
         }
 
+        inline bool isIdentityTolerance(T tolerance) const
+        {
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if (difference(_m[i][j], (i == j) ? T(1.0) : T(0.0)) > tolerance) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
         inline T determinant() const
         {
             return (
@@ -501,7 +521,7 @@ class MatrixRotation3 : public Matrix3<T>
     public:
         // constructors
         MatrixRotation3() : MatrixRotation3(UnitVector3<T>(T(1.0), T(0.0), T(0.0)), UnitVector3<T>(T(0.0), T(1.0), T(0.0)), UnitVector3<T>(T(0.0), T(0.0), T(1.0)) ) {}
-        MatrixRotation3(const UnitVector3<T> & inX, const UnitVector3<T>& inY, const UnitVector3<T>& inZ) : Matrix3<T>(inX.x(), inY.x(), inZ.x(), inX.y(), inY.y(), inZ.y(), inX.z(), inY.z(), inZ.z()) { _validate(inX, inY, inZ); }
+        MatrixRotation3(const UnitVector3<T> & inX, const UnitVector3<T>& inY, const UnitVector3<T>& inZ) : Matrix3<T>(inX.x(), inX.y(), inX.z(), inY.x(), inY.y(), inY.z(), inZ.x(), inZ.y(), inZ.z()) { _validate(inX, inY, inZ); }
         MatrixRotation3(const MatrixRotation3&) = default;
         ~MatrixRotation3() = default;
 
@@ -512,9 +532,9 @@ class MatrixRotation3 : public Matrix3<T>
         inline MatrixRotation3<T> transpose(void) const 
         {
             MatrixRotation3<T> mt(
-                UnitVector3(this->_m[0][0], this->_m[0][1], this->_m[0][2]),
-                UnitVector3(this->_m[1][0], this->_m[1][1], this->_m[1][2]),
-                UnitVector3(this->_m[2][0], this->_m[2][1], this->_m[2][2])
+                UnitVector3<T>(this->_m[0][0], this->_m[1][0], this->_m[2][0]),
+                UnitVector3<T>(this->_m[0][1], this->_m[1][1], this->_m[2][1]),
+                UnitVector3<T>(this->_m[0][2], this->_m[1][2], this->_m[2][2])
                 );
 
             return mt;
@@ -534,9 +554,9 @@ class MatrixRotation3 : public Matrix3<T>
             }
 
             return MatrixRotation3(
-                UnitVector3(mt[0][0], mt[1][0], mt[2][0]),
-                UnitVector3(mt[0][1], mt[1][1], mt[2][1]),
-                UnitVector3(mt[0][2], mt[1][2], mt[2][2])
+                UnitVector3<T>(mt[0][0], mt[0][1], mt[0][2]),
+                UnitVector3<T>(mt[1][0], mt[1][1], mt[1][2]),
+                UnitVector3<T>(mt[2][0], mt[2][1], mt[2][2])
             );
         }
 
@@ -566,7 +586,7 @@ class MatrixRotation3 : public Matrix3<T>
                 {
                     // Force using the parent class so that we don't do this validation
                     // routine recursively
-                    if (!(Matrix3<T>::multiply(Matrix3<T>::transpose()).isIdentity(T(4.0))))
+                    if (!(Matrix3<T>::multiply(Matrix3<T>::transpose()).isIdentityTolerance(T(.00001))))
                     {
                         newFlags |= HubertBase::cDegenerate;
                     }
@@ -606,7 +626,7 @@ class Line3 : public HubertBase
 {
     public:
         // constructors
-        Line3() : Line3(Point3(T(0.0), T(0.0), T(0.0)), Point3(T(1.0), T(1.0), T(1.0))) {}
+        Line3() : Line3(Point3<T>(T(0.0), T(0.0), T(0.0)), Point3<T>(T(1.0), T(1.0), T(1.0))) {}
         Line3(const Point3<T> & inP1, const Point3<T> & inP2) { _normalizeAndValidate(inP1, inP2); }
         Line3(const Line3 &) = default;
         ~Line3() = default;
@@ -1284,24 +1304,40 @@ inline bool isSubnormal(const Triangle3<T>& v)
 template <typename T>
 inline T dotProduct(const Vector3<T> & v1, const Vector3<T> & v2)
 {
+    if (v1.amDegenerate() || v2.amDegenerate())
+    {
+        return infinity<T>();
+    }
     return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z();
 }
 
 template <typename T>
 inline T dotProduct(const UnitVector3<T> & v1, const Vector3<T> & v2)
 {
+    if (v1.amDegenerate() || v2.amDegenerate())
+    {
+        return infinity<T>();
+    }
     return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z();
 }
 
 template <typename T>
 inline T dotProduct(const Vector3<T> & v1, const UnitVector3<T> & v2)
 {
+    if (v1.amDegenerate() || v2.amDegenerate())
+    {
+        return infinity<T>();
+    }
     return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z();
 }
 
 template <typename T>
 inline T dotProduct(const UnitVector3<T> & v1, const UnitVector3<T> & v2)
 {
+    if (v1.amDegenerate() || v2.amDegenerate())
+    {
+        return infinity<T>();
+    }
     return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z();
 }
 
@@ -1336,6 +1372,11 @@ inline Vector3<T> operator*(const UnitVector3<T>& v, T m)
 template <typename T>
 inline Vector3<T> crossProduct(const Vector3<T>& v1, const Vector3<T>& v2)
 {
+    if (v1.amDegenerate() || v2.amDegenerate())
+    {
+        return invalidVector3<T>();
+    }
+
     return Vector3<T>(
         v1.y() * v2.z() - v1.z() * v2.y(),
         v1.z() * v2.x() - v1.x() * v2.z(),
@@ -1346,6 +1387,11 @@ inline Vector3<T> crossProduct(const Vector3<T>& v1, const Vector3<T>& v2)
 template <typename T>
 inline Vector3<T> crossProduct(const Vector3<T>& v1, const UnitVector3<T>& v2)
 {
+    if (v1.amDegenerate() || v2.amDegenerate())
+    {
+        return invalidVector3<T>();
+    }
+
     return Vector3<T>(
         v1.y() * v2.z() - v1.z() * v2.y(),
         v1.z() * v2.x() - v1.x() * v2.z(),
@@ -1356,6 +1402,11 @@ inline Vector3<T> crossProduct(const Vector3<T>& v1, const UnitVector3<T>& v2)
 template <typename T>
 inline Vector3<T> crossProduct(const UnitVector3<T>& v1, const Vector3<T>& v2)
 {
+    if (v1.amDegenerate() || v2.amDegenerate())
+    {
+        return invalidVector3<T>();
+    }
+
     return Vector3<T>(
         v1.y() * v2.z() - v1.z() * v2.y(),
         v1.z() * v2.x() - v1.x() * v2.z(),
@@ -1364,9 +1415,14 @@ inline Vector3<T> crossProduct(const UnitVector3<T>& v1, const Vector3<T>& v2)
 }
 
 template <typename T>
-inline UnitVector3<T> crossProduct(const UnitVector3<T>& v1, const UnitVector3<T>& v2)
+inline Vector3<T> crossProduct(const UnitVector3<T>& v1, const UnitVector3<T>& v2)
 {
-    return UnitVector3<T>(
+    if (v1.amDegenerate() || v2.amDegenerate())
+    {
+        return invalidVector3<T>();
+    }
+
+    return Vector3<T>(
         v1.y() * v2.z() - v1.z() * v2.y(),
         v1.z() * v2.x() - v1.x() * v2.z(),
         v1.x() * v2.y() - v1.y() * v2.x()
@@ -1432,6 +1488,48 @@ inline T magnitude(const UnitVector3<T>& v)
     }
     return T(1.0);
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// Transforms
+/////////////////////////////////////////////////////////////////////////////
+
+template <typename T>
+inline Matrix3<T> transpose(const Matrix3<T>& v)
+{
+    return v.transpose();
+}
+
+template <typename T>
+inline MatrixRotation3<T> transpose(const MatrixRotation3<T>& v)
+{
+    return v.transpose();
+}
+
+template <typename T>
+inline Matrix3<T> multiply(const Matrix3<T>& v1, const Matrix3<T>& v2)
+{
+    return v1.multiply(v2);
+}
+
+// two valid rotation matrices are guaranteed to result in a rotation matrix
+template <typename T>
+inline MatrixRotation3<T> multiply(const MatrixRotation3<T> & v1, const MatrixRotation3<T> & v2)
+{
+    return v1.multiply(v2);
+}
+
+template <typename T>
+inline Vector3<T> multiply(const Vector3<T>& v, const Matrix3<T>& m)
+{
+    Vector3<T> ret(
+        v.x() * m.get(0, 0) + v.y() * m.get(1, 0) + v.z() * m.get(2, 0),
+        v.x() * m.get(0, 1) + v.y() * m.get(1, 1) + v.z() * m.get(2, 1),
+        v.x() * m.get(0, 2) + v.y() * m.get(1, 2) + v.z() * m.get(2, 2)
+    );
+
+    return ret;
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 // normal functions

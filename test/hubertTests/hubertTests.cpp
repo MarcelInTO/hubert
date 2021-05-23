@@ -1250,13 +1250,13 @@ TEMPLATE_TEST_CASE("Construct MatrixRotation3 with constant parameters", "[Matri
     hubert::MatrixRotation3<TestType> theMatrix(uv1, uv2, uv3);
 
     CHECK(theMatrix.get(0, 0) == TestType(uv1.x()));
-    CHECK(theMatrix.get(0, 1) == TestType(uv2.x()));
-    CHECK(theMatrix.get(0, 2) == TestType(uv3.x()));
-    CHECK(theMatrix.get(1, 0) == TestType(uv1.y()));
+    CHECK(theMatrix.get(0, 1) == TestType(uv1.y()));
+    CHECK(theMatrix.get(0, 2) == TestType(uv1.z()));
+    CHECK(theMatrix.get(1, 0) == TestType(uv2.x()));
     CHECK(theMatrix.get(1, 1) == TestType(uv2.y()));
-    CHECK(theMatrix.get(1, 2) == TestType(uv3.y()));
-    CHECK(theMatrix.get(2, 0) == TestType(uv1.z()));
-    CHECK(theMatrix.get(2, 1) == TestType(uv2.z()));
+    CHECK(theMatrix.get(1, 2) == TestType(uv2.z()));
+    CHECK(theMatrix.get(2, 0) == TestType(uv3.x()));
+    CHECK(theMatrix.get(2, 1) == TestType(uv3.y()));
     CHECK(theMatrix.get(2, 2) == TestType(uv3.z()));
 
     CHECK(hubert::isValid(theMatrix));
@@ -1273,13 +1273,13 @@ TEMPLATE_TEST_CASE("Construct MatrixRotation3 with copy  constructor", "[MatrixR
     hubert::MatrixRotation3<TestType> theMatrix(sourceMatrix);
 
     CHECK(theMatrix.get(0, 0) == TestType(uv1.x()));
-    CHECK(theMatrix.get(0, 1) == TestType(uv2.x()));
-    CHECK(theMatrix.get(0, 2) == TestType(uv3.x()));
-    CHECK(theMatrix.get(1, 0) == TestType(uv1.y()));
+    CHECK(theMatrix.get(0, 1) == TestType(uv1.y()));
+    CHECK(theMatrix.get(0, 2) == TestType(uv1.z()));
+    CHECK(theMatrix.get(1, 0) == TestType(uv2.x()));
     CHECK(theMatrix.get(1, 1) == TestType(uv2.y()));
-    CHECK(theMatrix.get(1, 2) == TestType(uv3.y()));
-    CHECK(theMatrix.get(2, 0) == TestType(uv1.z()));
-    CHECK(theMatrix.get(2, 1) == TestType(uv2.z()));
+    CHECK(theMatrix.get(1, 2) == TestType(uv2.z()));
+    CHECK(theMatrix.get(2, 0) == TestType(uv3.x()));
+    CHECK(theMatrix.get(2, 1) == TestType(uv3.y()));
     CHECK(theMatrix.get(2, 2) == TestType(uv3.z()));
 
     CHECK(hubert::isValid(theMatrix));
@@ -1296,13 +1296,13 @@ TEMPLATE_TEST_CASE("Construct MatrixRotation3 with assignment", "[MatrixRotation
     hubert::MatrixRotation3<TestType> theMatrix = sourceMatrix;
 
     CHECK(theMatrix.get(0, 0) == TestType(uv1.x()));
-    CHECK(theMatrix.get(0, 1) == TestType(uv2.x()));
-    CHECK(theMatrix.get(0, 2) == TestType(uv3.x()));
-    CHECK(theMatrix.get(1, 0) == TestType(uv1.y()));
+    CHECK(theMatrix.get(0, 1) == TestType(uv1.y()));
+    CHECK(theMatrix.get(0, 2) == TestType(uv1.z()));
+    CHECK(theMatrix.get(1, 0) == TestType(uv2.x()));
     CHECK(theMatrix.get(1, 1) == TestType(uv2.y()));
-    CHECK(theMatrix.get(1, 2) == TestType(uv3.y()));
-    CHECK(theMatrix.get(2, 0) == TestType(uv1.z()));
-    CHECK(theMatrix.get(2, 1) == TestType(uv2.z()));
+    CHECK(theMatrix.get(1, 2) == TestType(uv2.z()));
+    CHECK(theMatrix.get(2, 0) == TestType(uv3.x()));
+    CHECK(theMatrix.get(2, 1) == TestType(uv3.y()));
     CHECK(theMatrix.get(2, 2) == TestType(uv3.z()));
 
     CHECK(hubert::isValid(theMatrix));
@@ -1320,13 +1320,13 @@ TEMPLATE_TEST_CASE("Construct MatrixRotation3 with initializer", "[MatrixRotatio
     hubert::MatrixRotation3<TestType> theMatrix { sourceMatrix };
 
     CHECK(theMatrix.get(0, 0) == TestType(uv1.x()));
-    CHECK(theMatrix.get(0, 1) == TestType(uv2.x()));
-    CHECK(theMatrix.get(0, 2) == TestType(uv3.x()));
-    CHECK(theMatrix.get(1, 0) == TestType(uv1.y()));
+    CHECK(theMatrix.get(0, 1) == TestType(uv1.y()));
+    CHECK(theMatrix.get(0, 2) == TestType(uv1.z()));
+    CHECK(theMatrix.get(1, 0) == TestType(uv2.x()));
     CHECK(theMatrix.get(1, 1) == TestType(uv2.y()));
-    CHECK(theMatrix.get(1, 2) == TestType(uv3.y()));
-    CHECK(theMatrix.get(2, 0) == TestType(uv1.z()));
-    CHECK(theMatrix.get(2, 1) == TestType(uv2.z()));
+    CHECK(theMatrix.get(1, 2) == TestType(uv2.z()));
+    CHECK(theMatrix.get(2, 0) == TestType(uv3.x()));
+    CHECK(theMatrix.get(2, 1) == TestType(uv3.y()));
     CHECK(theMatrix.get(2, 2) == TestType(uv3.z()));
 
     CHECK(hubert::isValid(theMatrix));
@@ -1356,13 +1356,13 @@ TEMPLATE_TEST_CASE(" MatrixRotation3 specific degeneracy test", "[MatrixRotation
         hubert::MatrixRotation3<TestType> theMatrix{ sourceMatrix };
 
         CHECK(theMatrix.get(0, 0) == TestType(uv1.x()));
-        CHECK(theMatrix.get(0, 1) == TestType(uv2.x()));
-        CHECK(theMatrix.get(0, 2) == TestType(uv3.x()));
-        CHECK(theMatrix.get(1, 0) == TestType(uv1.y()));
+        CHECK(theMatrix.get(0, 1) == TestType(uv1.y()));
+        CHECK(theMatrix.get(0, 2) == TestType(uv1.z()));
+        CHECK(theMatrix.get(1, 0) == TestType(uv2.x()));
         CHECK(theMatrix.get(1, 1) == TestType(uv2.y()));
-        CHECK(theMatrix.get(1, 2) == TestType(uv3.y()));
-        CHECK(theMatrix.get(2, 0) == TestType(uv1.z()));
-        CHECK(theMatrix.get(2, 1) == TestType(uv2.z()));
+        CHECK(theMatrix.get(1, 2) == TestType(uv2.z()));
+        CHECK(theMatrix.get(2, 0) == TestType(uv3.x()));
+        CHECK(theMatrix.get(2, 1) == TestType(uv3.y()));
         CHECK(theMatrix.get(2, 2) == TestType(uv3.z()));
 
         CHECK(hubert::isValid(theMatrix));
@@ -1379,13 +1379,13 @@ TEMPLATE_TEST_CASE(" MatrixRotation3 specific degeneracy test", "[MatrixRotation
         hubert::MatrixRotation3<TestType> theMatrix{ sourceMatrix };
 
         CHECK(theMatrix.get(0, 0) == TestType(uv1.x()));
-        CHECK(theMatrix.get(0, 1) == TestType(uv2.x()));
-        CHECK(theMatrix.get(0, 2) == TestType(uv3.x()));
-        CHECK(theMatrix.get(1, 0) == TestType(uv1.y()));
+        CHECK(theMatrix.get(0, 1) == TestType(uv1.y()));
+        CHECK(theMatrix.get(0, 2) == TestType(uv1.z()));
+        CHECK(theMatrix.get(1, 0) == TestType(uv2.x()));
         CHECK(theMatrix.get(1, 1) == TestType(uv2.y()));
-        CHECK(theMatrix.get(1, 2) == TestType(uv3.y()));
-        CHECK(theMatrix.get(2, 0) == TestType(uv1.z()));
-        CHECK(theMatrix.get(2, 1) == TestType(uv2.z()));
+        CHECK(theMatrix.get(1, 2) == TestType(uv2.z()));
+        CHECK(theMatrix.get(2, 0) == TestType(uv3.x()));
+        CHECK(theMatrix.get(2, 1) == TestType(uv3.y()));
         CHECK(theMatrix.get(2, 2) == TestType(uv3.z()));
 
         CHECK(hubert::isValid(theMatrix));
@@ -3010,3 +3010,202 @@ TEMPLATE_TEST_CASE("makeRay3(Point3, Point3)", "[make]", float, double)
     CHECK(hubert::isEqual(madeRay.unitDirection().z(), v1.z() / hubert::magnitude(v1)));
 }
 
+///////////////////////////////////////////////////////////////////////////
+// Vector math
+///////////////////////////////////////////////////////////////////////////
+
+TEMPLATE_TEST_CASE("dotProduct(Vector3, Vector3)", "[vectorMath]", float, double)
+{
+    hubert::Vector3<TestType> v1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::Vector3<TestType> v2(TestType(-3.7), TestType(7.7), TestType(-11.7));
+
+    TestType ret = hubert::dotProduct(v1, v2);
+
+    CHECK(hubert::isEqualScaled(ret,v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z(), TestType(5.0)));
+}
+
+TEMPLATE_TEST_CASE("dotProduct(UnitVector3, Vector3)", "[vectorMath]", float, double)
+{
+    hubert::UnitVector3<TestType> v1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::Vector3<TestType> v2(TestType(-3.7), TestType(7.7), TestType(-11.7));
+
+    TestType ret = hubert::dotProduct(v1, v2);
+
+    CHECK(hubert::isEqualScaled(ret, v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z(), TestType(5.0)));
+}
+
+TEMPLATE_TEST_CASE("dotProduct(Vector3, UnitVector3)", "[vectorMath]", float, double)
+{
+    hubert::Vector3<TestType> v1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::UnitVector3<TestType> v2(TestType(-3.7), TestType(7.7), TestType(-11.7));
+
+    TestType ret = hubert::dotProduct(v1, v2);
+
+    CHECK(hubert::isEqualScaled(ret, v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z(), TestType(5.0)));
+}
+
+TEMPLATE_TEST_CASE("dotProduct(UnitVector3, UnitVector3)", "[vectorMath]", float, double)
+{
+    hubert::UnitVector3<TestType> v1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::UnitVector3<TestType> v2(TestType(-3.7), TestType(7.7), TestType(-11.7));
+
+    TestType ret = hubert::dotProduct(v1, v2);
+
+    CHECK(hubert::isEqualScaled(ret, v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z(), TestType(5.0)));
+}
+
+TEMPLATE_TEST_CASE("multiply(Vector3)", "[vectorMath]", float, double)
+{
+    hubert::Vector3<TestType> v1(TestType(1.1), TestType(2.1), TestType(3.1));
+
+    TestType factor = TestType(3.0);
+    hubert::Vector3<TestType>  ret = hubert::multiply(v1, factor);
+
+    CHECK(hubert::isEqual(ret.x(), v1.x() * factor));
+    CHECK(hubert::isEqual(ret.y(), v1.y() * factor));
+    CHECK(hubert::isEqual(ret.z(), v1.z() * factor));
+}
+
+TEMPLATE_TEST_CASE("operator*(Vector3)", "[vectorMath]", float, double)
+{
+    hubert::Vector3<TestType> v1(TestType(1.1), TestType(2.1), TestType(3.1));
+
+    TestType factor = TestType(3.0);
+    hubert::Vector3<TestType>  ret = v1 * factor;
+
+    CHECK(hubert::isEqual(ret.x(), v1.x() * factor));
+    CHECK(hubert::isEqual(ret.y(), v1.y() * factor));
+    CHECK(hubert::isEqual(ret.z(), v1.z() * factor));
+}
+
+TEMPLATE_TEST_CASE("multiply(UnitVector3)", "[vectorMath]", float, double)
+{
+    hubert::UnitVector3<TestType> v1(TestType(1.1), TestType(2.1), TestType(3.1));
+
+    TestType factor = TestType(3.0);
+    hubert::Vector3<TestType>  ret = hubert::multiply(v1, factor);
+
+    CHECK(hubert::isEqual(ret.x(), v1.x() * factor));
+    CHECK(hubert::isEqual(ret.y(), v1.y() * factor));
+    CHECK(hubert::isEqual(ret.z(), v1.z() * factor));
+}
+
+TEMPLATE_TEST_CASE("operator*(UnitVector3)", "[vectorMath]", float, double)
+{
+    hubert::UnitVector3<TestType> v1(TestType(1.1), TestType(2.1), TestType(3.1));
+
+    TestType factor = TestType(3.0);
+    hubert::Vector3<TestType>  ret = v1 * factor;
+
+    CHECK(hubert::isEqual(ret.x(), v1.x() * factor));
+    CHECK(hubert::isEqual(ret.y(), v1.y() * factor));
+    CHECK(hubert::isEqual(ret.z(), v1.z() * factor));
+} 
+
+TEMPLATE_TEST_CASE("crossProduct(Vector3, Vector3)", "[vectorMath]", float, double)
+{
+    hubert::Vector3<TestType> v1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::Vector3<TestType> v2(TestType(-3.7), TestType(7.7), TestType(-11.7));
+
+    hubert::Vector3<TestType> ret = hubert::crossProduct(v1, v2);
+
+    CHECK(hubert::isEqualScaled(ret.x(), v1.y() * v2.z() - v1.z() * v2.y(), TestType(3.0)));
+    CHECK(hubert::isEqualScaled(ret.y(), v1.z() * v2.x() - v1.x() * v2.z(), TestType(3.0)));
+    CHECK(hubert::isEqualScaled(ret.z(), v1.x() * v2.y() - v1.y() * v2.x(), TestType(3.0)));
+}
+
+TEMPLATE_TEST_CASE("crossProduct(UnitVector3, Vector3)", "[vectorMath]", float, double)
+{
+    hubert::UnitVector3<TestType> v1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::Vector3<TestType> v2(TestType(-3.7), TestType(7.7), TestType(-11.7));
+
+    hubert::Vector3<TestType> ret = hubert::crossProduct(v1, v2);
+
+    CHECK(hubert::isEqualScaled(ret.x(), v1.y() * v2.z() - v1.z() * v2.y(), TestType(3.0)));
+    CHECK(hubert::isEqualScaled(ret.y(), v1.z() * v2.x() - v1.x() * v2.z(), TestType(3.0)));
+    CHECK(hubert::isEqualScaled(ret.z(), v1.x() * v2.y() - v1.y() * v2.x(), TestType(3.0)));
+}
+
+TEMPLATE_TEST_CASE("crossProduct(Vector3, UnitVector3)", "[vectorMath]", float, double)
+{
+    hubert::Vector3<TestType> v1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::UnitVector3<TestType> v2(TestType(-3.7), TestType(7.7), TestType(-11.7));
+
+    hubert::Vector3<TestType> ret = hubert::crossProduct(v1, v2);
+
+    CHECK(hubert::isEqualScaled(ret.x(), v1.y() * v2.z() - v1.z() * v2.y(), TestType(3.0)));
+    CHECK(hubert::isEqualScaled(ret.y(), v1.z() * v2.x() - v1.x() * v2.z(), TestType(3.0)));
+    CHECK(hubert::isEqualScaled(ret.z(), v1.x() * v2.y() - v1.y() * v2.x(), TestType(3.0)));
+}
+
+TEMPLATE_TEST_CASE("crossProduct(UnitVector3, UnitVector3)", "[vectorMath]", float, double)
+{
+    hubert::UnitVector3<TestType> v1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::UnitVector3<TestType> v2(TestType(-3.7), TestType(7.7), TestType(-11.7));
+
+    hubert::Vector3<TestType> ret = hubert::crossProduct(v1, v2);
+
+    CHECK(hubert::isEqualScaled(ret.x(), v1.y() * v2.z() - v1.z() * v2.y(), TestType(3.0)));
+    CHECK(hubert::isEqualScaled(ret.y(), v1.z() * v2.x() - v1.x() * v2.z(), TestType(3.0)));
+    CHECK(hubert::isEqualScaled(ret.z(), v1.x() * v2.y() - v1.y() * v2.x(), TestType(3.0)));
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Distance functions
+/////////////////////////////////////////////////////////////////////////////
+
+TEMPLATE_TEST_CASE("distance(Point3, Point3)", "[distance]", float, double)
+{
+    hubert::Point3<TestType> v1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::Point3<TestType> v2(TestType(-3.7), TestType(7.7), TestType(-11.7));
+
+    TestType ret = hubert::distance(v1, v2);
+
+    CHECK(hubert::isEqual(ret, std::hypot(v1.x() - v2.x(), v1.y() - v2.y(), v1.z() - v2.z())));
+}
+
+TEMPLATE_TEST_CASE("distance(Point3, Plane)", "[distance]", float, double)
+{
+    hubert::Point3<TestType> testPoint(TestType(11.1), TestType(3.1), TestType(-5.1));
+    hubert::Point3<TestType> v1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::UnitVector3<TestType> up(TestType(0.53452248382484900), TestType(0.80178372573727300), TestType(-0.26726124191242400));
+    hubert::Plane<TestType> thePlane(v1, up);
+
+    TestType ret = hubert::distance(testPoint, thePlane);
+
+    CHECK(hubert::isEqualScaled(ret, TestType(8.338550747667640007), TestType(8.0)));
+}
+ 
+
+TEMPLATE_TEST_CASE("distance(Plane, Point3)", "[distance]", float, double)
+{
+    hubert::Point3<TestType> testPoint(TestType(11.1), TestType(3.1), TestType(-5.1));
+    hubert::Point3<TestType> v1(TestType(1.1), TestType(2.1), TestType(3.1));
+    hubert::UnitVector3<TestType> up(TestType(0.53452248382484900), TestType(0.80178372573727300), TestType(-0.26726124191242400));
+    hubert::Plane<TestType> thePlane(v1, up);
+
+    TestType ret = hubert::distance(thePlane, testPoint);
+
+    CHECK(hubert::isEqualScaled(ret, TestType(8.338550747667640007), TestType(8.0)));
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Transforms
+/////////////////////////////////////////////////////////////////////////////
+
+TEMPLATE_TEST_CASE("multiply(Vector3, Matrix3)", "[transform]", float, double)
+{
+    hubert::MatrixRotation3<TestType> theMatrix(
+        hubert::UnitVector3<TestType>(TestType(0.7280277), TestType(0.5251048), TestType(0.4407273)),
+        hubert::UnitVector3<TestType>(TestType(-0.6087886), TestType(0.7907906), TestType(0.0634566)),
+        hubert::UnitVector3<TestType>(TestType(-0.3152016), TestType(-0.3145079), TestType(0.8953953))
+    );
+    hubert::Vector3<TestType> theVector(TestType(1.0), TestType(1.0), TestType(1.0));
+
+    hubert::Vector3<TestType> ret = hubert::multiply(theVector, theMatrix);
+    
+    TestType tolerance = TestType(.00001);
+    CHECK(hubert::difference(ret.x(), TestType(-0.19596)) < tolerance);
+    CHECK(hubert::difference(ret.y(), TestType(1.00139)) < tolerance);
+    CHECK(hubert::difference(ret.z(), TestType(1.39958)) < tolerance);
+}
