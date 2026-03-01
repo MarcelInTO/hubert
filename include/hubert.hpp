@@ -1585,6 +1585,29 @@ inline Point3<T> closestPoint(const Plane<T>& thePlane, const Point3<T>& thePoin
     return (thePoint - multiply(thePlane.up(), distance));
 }
 
+template <typename T>
+inline Point3<T> closestPoint(const Segment3<T> & theSegment, const Point3<T> & thePoint)
+{
+    Vector3<T> seg = makeVector3(theSegment.base(), theSegment.target());
+    Vector3<T> v = makeVector3(theSegment.base(), thePoint);
+    T segLenSq = dotProduct(seg, seg);
+    T t = dotProduct(v, seg) / segLenSq;
+
+    if (t <= T(0.0)) return theSegment.base();
+    if (t >= T(1.0)) return theSegment.target();
+    return theSegment.base() + multiply(seg, t);
+}
+
+template <typename T>
+inline Point3<T> closestPoint(const Ray3<T> & theRay, const Point3<T> & thePoint)
+{
+    Vector3<T> v = makeVector3(theRay.base(), thePoint);
+    T f = dotProduct(theRay.unitDirection(), v);
+
+    if (f <= T(0.0)) return theRay.base();
+    return theRay.base() + multiply(theRay.unitDirection(), f);
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // Addition functions
 /////////////////////////////////////////////////////////////////////////////
